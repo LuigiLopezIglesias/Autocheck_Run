@@ -22,9 +22,9 @@ print(paste0("Location od pipeline storage files is on: ",opt$Path))
 #########################################################################################
 
 
-ifelse(opt$Warehouse == "Local",
-       PATH <- paste0("/home/yamishakka/Escritorio/Runs_rename/",opt$date,"/"),
-       PATH <- paste0("/media/yamishakka/Elements/Runs_Good/",opt$date,"/"))
+PATH <- ifelse(opt$Warehouse == "Local",
+       paste0("/home/yamishakka/Escritorio/Runs_rename/",opt$date,"/"),
+       paste0("/media/yamishakka/Elements/Runs_Good/",opt$date,"/"))
 
 Fastq <- list.files(path = PATH, 
                     pattern = "_R1_", 
@@ -42,7 +42,7 @@ Reads <- character()
 Samples <- character()
 for (i in Fastq) {
   sample <- sub('_S.*', '',i)
-  print(sample)
+  #print(sample)
   Samples <- rbind(Samples, sample)
   Count <- system(paste0("cp ",PATH,i," /tmp/fastatmp.gz && gunzip /tmp/fastatmp.gz && wc -l /tmp/fastatmp && rm /tmp/fastatmp"), intern = TRUE)
   Raw_Reads <- as.integer(sub(' /.*', '',Count))
@@ -69,3 +69,11 @@ print(Reads_ITS)
 dir.create(paste0(opt$Path,opt$date,"/"), showWarnings = FALSE, recursive = TRUE)
 write.table(Reads_ITS, file = paste0(opt$Path,opt$date,"/ITS_",opt$date,"_Reads_Raw.csv"), sep=",",row.names = FALSE, quote = FALSE)
 write.table(Reads_16S, file = paste0(opt$Path,opt$date,"/16S_",opt$date,"_Reads_Raw.csv"), sep=",",row.names = FALSE, quote = FALSE)
+
+
+print("O       o O       o O       o          O       o O       o O       o")
+print("| O   o | | O   o | | O   o |   STEP   | O   o | | O   o | | O   o |")
+print("| | O | | | | O | | | | O | |    1     | | O | | | | O | | | | O | |")
+print("| o   O | | o   O | | o   O | FINISHED | o   O | | o   O | | o   O |")
+print("o       O o       O o       O          o       O o       O o       O")
+

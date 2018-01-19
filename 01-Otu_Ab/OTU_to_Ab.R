@@ -72,9 +72,8 @@ for (chain in c("16S","ITS")) {
 	}
 }
 
-
-print("O       o O       o O       o")
-print("| O   o | | O   o | | O   o |")
-print("| | O | | | | O | | | | O | |")
-print("| o   O | | o   O | | o   O |")
-print("o       O o       O o       O")
+print("O       o O       o O       o          O       o O       o O       o")
+print("| O   o | | O   o | | O   o |   STEP   | O   o | | O   o | | O   o |")
+print("| | O | | | | O | | | | O | |    2     | | O | | | | O | | | | O | |")
+print("| o   O | | o   O | | o   O | FINISHED | o   O | | o   O | | o   O |")
+print("o       O o       O o       O          o       O o       O o       O")
