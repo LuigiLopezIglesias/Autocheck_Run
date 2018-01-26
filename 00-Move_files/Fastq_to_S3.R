@@ -8,17 +8,13 @@ option_list <- list(
               dest='date', type='character'),
   make_option(c('-w', '--warehouse'), action='store',
               dest='Warehouse', type='character',
-              default="Hard Disk"),
-  make_option(c('-p', '--path'), action='store',
-              dest='Path', type='character',
-              default="/home/yamishakka/Escritorio/Biomemakers/00-NP_Abundances/")
+              default="Hard Disk")
 )
 
 opt <- parse_args(OptionParser(option_list=option_list))
 
 print(paste0("Run date to upload is: ",opt$date))
 print(paste0("Location of run folder is on: ",opt$Warehouse))
-print(paste0("Location od pipeline storage files is on: ",opt$Path))
 #########################################################################################
 
 ### Archivos descargados de sFTP
