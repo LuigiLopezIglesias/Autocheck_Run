@@ -36,7 +36,7 @@ Fastq <- list.files(path = PATH,
                     include.dirs = FALSE, 
                     no.. = FALSE)
 
-writeLines(c("","||||","Ready to anlyze reads number by sample in run","||||",""), con = stdout(), sep = "\n")
+cat(silver("\nReady to anlyze reads number by sample in run \n\n"))
 #Fastq<-gsub("Undetermined.*","",Fastq)
 
 Reads <- character()
@@ -52,9 +52,9 @@ for (i in Fastq) {
   cat(yellow(reads)%+%" reads\n")
 }
 
-ReadsNumber = data.frame(Sample = Samples,
+ReadsNumber = suppressWarnings(data.frame(Sample = Samples,
                          Reads = as.integer(Reads),
-                         stringsAsFactors = FALSE)
+                         stringsAsFactors = FALSE))
 ReadsNumber["Date"] <- opt$date
 
 Reads_file <- unique(ReadsNumber) %>%
