@@ -1,5 +1,6 @@
 require(optparse)
 require(stringr)
+library(crayon)
 
 #########################################################################################
 ###     Cargar argumentos//Load arguments      ###
@@ -13,12 +14,12 @@ option_list <- list(
 
 opt <- parse_args(OptionParser(option_list=option_list))
 
-print(paste0("Run date to upload is: ",opt$date))
-print(paste0("Location of run folder is on: ",opt$Warehouse))
+cat(blue("Run date to upload is: "%+%green$bold(opt$date)%+%"\n"))
+cat(blue("Location of run folder is on: "%+%green$bold(opt$Warehouse)%+%"\n"))
 #########################################################################################
 
 ### Archivos descargados de sFTP
-writeLines("\n Making list of Run \n")
+cat(silver("\n Making list of Run \n"))
 PATH <- ifelse(opt$Warehouse == "Local",
        paste0("/home/yamishakka/Escritorio/Runs_rename/",opt$date,"/"),
        paste0("/media/yamishakka/Elements/Runs_Good/",opt$date,"/"))
@@ -35,28 +36,27 @@ XMLFiles <- paste0("aws s3 mv ",PATH,"/config.xml ",Folder)
   system(XMLFiles, inter = TRUE)
 
 ### Seleccion de nombre de muestra
-writeLines("\n Making Sample name \n")
+cat(silver("\n Making Sample name \n"))
 mysamps <- vector()
 for (i in Samples) {
-Split_pos <- str_sub(i, 1, (str_locate(i, "_")-1))
-mysamps = rbind(mysamps, Split_pos[1])
+  Split_pos <- str_sub(i, 1, (str_locate(i, "_")-1))
+  mysamps = rbind(mysamps, Split_pos[1])
 }
 mysamps <- mysamps[!is.na(mysamps)]
 mysamps <- unique(mysamps, incomparables = FALSE)
 
 #### Nombre de las muestras a guardar
 
-for (k in mysamps) {
-print(k)
-  Folder <- paste0("s3://raw-illumina-runs/RUN_",opt$date,"/FASTQ/",opt$date,"_",k,"/")
-  UpCommand <- paste0("aws s3 sync ",PATH," ",Folder," --exclude '*' --include '",k,"_*'")
+for (SamP in mysamps) {
+  cat("Uploadin sample "%+%yellow(SamP)%+%" to ")
+  Folder <- paste0("s3://raw-illumina-runs/RUN_",opt$date,"/FASTQ/",opt$date,"_",SamP,"/")
+  UpCommand <- paste0("aws s3 sync ",PATH," ",Folder," --exclude '*' --include '",SamP,"_*'")
   system(UpCommand, inter = TRUE)
-  print(Folder)
+  cat(blue(Folder)%+%"\n")
 }
 
-print("O       o O       o O       o          O       o O       o O       o")
-print("| O   o | | O   o | | O   o |  UPLOAD  | O   o | | O   o | | O   o |")
-print("| | O | | | | O | | | | O | |          | | O | | | | O | | | | O | |")
-print("| o   O | | o   O | | o   O | FINISHED | o   O | | o   O | | o   O |")
-print("o       O o       O o       O          o       O o       O o       O")
-
+cat(red$bold("O       o O       o O       o          O       o O       o O       o\n"))
+cat(red$bold("| O   o | | O   o | | O   o |  UPLOAD  | O   o | | O   o | | O   o |\n"))
+cat(red$bold("| | O | | | | O | | | | O | |          | | O | | | | O | | | | O | |\n"))
+cat(red$bold("| o   O | | o   O | | o   O | FINISHED | o   O | | o   O | | o   O |\n"))
+cat(red$bold("o       O o       O o       O          o       O o       O o       O\n"))
