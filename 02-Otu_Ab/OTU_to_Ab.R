@@ -2,6 +2,7 @@ library(dplyr)
 require(xlsx)
 library(biomformat)
 library(optparse)
+library(crayon)
 
 #########################################################################################
 ###     Cargar argumentos//Load arguments      ###
@@ -17,9 +18,10 @@ option_list <- list(
 
 opt <- parse_args(OptionParser(option_list=option_list))
 
-print(paste0("Run date to analyze is: ",opt$date))
-print(paste0("Your confidence value is: ",opt$confVal))
-print(paste0("The path where input file and output file an folder is: ",opt$Path))
+cat(blue("Run date to analyze is: "%+%green$bold(opt$date)%+%"\n"))
+cat(blue("Your confidence value is: "%+%green$bold(opt$confVal)%+%"\n"))
+cat(blue("The path where input file and output file an folder is: "%+%green$bold(opt$Path)%+%"\n"))
+
 #########################################################################################
 
 for (chain in c("16S","ITS")) {
@@ -72,8 +74,8 @@ for (chain in c("16S","ITS")) {
 	}
 }
 
-print("O       o O       o O       o          O       o O       o O       o")
-print("| O   o | | O   o | | O   o |   STEP   | O   o | | O   o | | O   o |")
-print("| | O | | | | O | | | | O | |    2     | | O | | | | O | | | | O | |")
-print("| o   O | | o   O | | o   O | FINISHED | o   O | | o   O | | o   O |")
-print("o       O o       O o       O          o       O o       O o       O")
+cat(red$bold("O       o O       o O       o          O       o O       o O       o\n"))
+cat(red$bold("| O   o | | O   o | | O   o |   STEP   | O   o | | O   o | | O   o |\n"))
+cat(red$bold("| | O | | | | O | | | | O | |    2     | | O | | | | O | | | | O | |\n"))
+cat(red$bold("| o   O | | o   O | | o   O | FINISHED | o   O | | o   O | | o   O |\n"))
+cat(red$bold("o       O o       O o       O          o       O o       O o       O\n"))

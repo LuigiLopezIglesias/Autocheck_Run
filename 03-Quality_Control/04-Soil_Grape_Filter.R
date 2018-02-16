@@ -1,5 +1,6 @@
 library(optparse)
 library(dplyr)
+library(crayon)
 
 #########################################################################################
 ###     Cargar argumentos//Load arguments      ###
@@ -14,6 +15,9 @@ option_list <- list(
 )
 ### Load arguments
 opt <- parse_args(OptionParser(option_list=option_list))
+
+cat(blue("Run date to analyze is: "%+%green$bold(opt$date)%+%"\n"))
+cat(blue("The path where input file and output file an folder is: "%+%green$bold(opt$Path)%+%"\n"))
 
 ##### FUNCTIONS
 ### Column Selection 
@@ -78,7 +82,7 @@ for (chain in c("16S","ITS")) {
                    ignore.case = FALSE, include.dirs = FALSE, no.. = FALSE)
         F_Date <- gsub("^.*?_","",F_Date[length(F_Date)])
       }
-
+      cat(blue("Control files used in "%+%chain%+%" are on date: "%+%green$bold(F_Date)%+%"\n"))
      ### Contamination check
      TOP_10 <- Samp %>% 
        arrange_(.dots = paste0("desc(",i,")")) %>% 
@@ -207,7 +211,7 @@ for (chain in c("16S","ITS")) {
                   ignore.case = FALSE, include.dirs = FALSE, no.. = TRUE)
        F_Date <- gsub("^.*?_","",F_Date[length(F_Date)])
      }
-
+     cat(blue("Control files used in "%+%chain%+%" are on date: "%+%green$bold(F_Date)%+%"\n"))
      ### Contamination check
      TOP_10 <- Samp %>% 
        arrange_(.dots = paste0("desc(",i,")")) %>% 
@@ -318,12 +322,11 @@ for (chain in c("16S","ITS")) {
    dir.create(paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Soil_Grape/",chain,"/Informs/"), showWarnings = FALSE, recursive = TRUE)
    write.table(Bac_Soil_Grape, file = paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Soil_Grape/",chain,"/Informs/Good_SoilGrape_",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
  }
- print(paste0("Finished analysis of ",chain))
+ cat(blue("Finished analysis of "%+%green$bold(chain)%+%"\n"))
 }
 
-print("O       o O       o O       o          O       o O       o O       o")
-print("| O   o | | O   o | | O   o |  Q_STEP  | O   o | | O   o | | O   o |")
-print("| | O | | | | O | | | | O | |    4     | | O | | | | O | | | | O | |")
-print("| o   O | | o   O | | o   O | FINISHED | o   O | | o   O | | o   O |")
-print("o       O o       O o       O          o       O o       O o       O")
- 
+cat(magenta$bold("O       o O       o O       o          O       o O       o O       o\n"))
+cat(magenta$bold("| O   o | | O   o | | O   o |  Q_STEP  | O   o | | O   o | | O   o |\n"))
+cat(magenta$bold("| | O | | | | O | | | | O | |    4     | | O | | | | O | | | | O | |\n"))
+cat(magenta$bold("| o   O | | o   O | | o   O | FINISHED | o   O | | o   O | | o   O |\n"))
+cat(magenta$bold("o       O o       O o       O          o       O o       O o       O\n"))

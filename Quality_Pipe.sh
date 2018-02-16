@@ -4,7 +4,7 @@
 # PATHx="-p Path"
 # QDate="-f date" 
 
-DATE="-d 20171220"
+DATE="-d 20180207"
 Conf=
 PATHx=
 QDate=

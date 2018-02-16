@@ -1,5 +1,6 @@
 library(optparse)
 library(dplyr)
+library(crayon)
 
 #########################################################################################
 ###     Cargar argumentos//Load arguments      ###
@@ -12,6 +13,9 @@ option_list <- list(
 )
 
 opt <- parse_args(OptionParser(option_list=option_list))
+
+cat(blue("Run date to analyze is: "%+%green$bold(opt$date)%+%"\n"))
+cat(blue("The path where input file and output file an folder is: "%+%green$bold(opt$Path)%+%"\n"))
 
 #### FUNCIONES
 ## Especies por muestra positiva
@@ -101,12 +105,11 @@ for (chain in c("16S","ITS")) {
  }
  dir.create(paste0(opt$Path,opt$date,"/NoWineseq/Good_Reads/",chain,"/Informs/"), showWarnings = FALSE, recursive = TRUE)
  write.table(BMK, file = paste0(opt$Path,opt$date,"/NoWineseq/Good_Reads/",chain,"/Informs/Good_BMK_",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
- print(paste0("Finished analysis of ",chain))
+ cat(blue("Finished analysis of "%+%green$bold(chain)%+%"\n"))
 }
 
-print("O       o O       o O       o          O       o O       o O       o")
-print("| O   o | | O   o | | O   o |  Q_STEP  | O   o | | O   o | | O   o |")
-print("| | O | | | | O | | | | O | |    2     | | O | | | | O | | | | O | |")
-print("| o   O | | o   O | | o   O | FINISHED | o   O | | o   O | | o   O |")
-print("o       O o       O o       O          o       O o       O o       O")
- 
+cat(magenta$bold("O       o O       o O       o          O       o O       o O       o\n"))
+cat(magenta$bold("| O   o | | O   o | | O   o |  Q_STEP  | O   o | | O   o | | O   o |\n"))
+cat(magenta$bold("| | O | | | | O | | | | O | |    2     | | O | | | | O | | | | O | |\n"))
+cat(magenta$bold("| o   O | | o   O | | o   O | FINISHED | o   O | | o   O | | o   O |\n"))
+cat(magenta$bold("o       O o       O o       O          o       O o       O o       O\n"))

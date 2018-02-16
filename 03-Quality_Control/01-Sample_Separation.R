@@ -1,6 +1,7 @@
 library(optparse)
 library(dplyr)
 library(RPostgreSQL)
+library(crayon)
 
 #########################################################################################
 ###     Cargar argumentos//Load arguments      ###
@@ -23,6 +24,14 @@ option_list <- list(
 )
 
 opt <- parse_args(OptionParser(option_list=option_list))
+
+cat(blue("Run date to analyze is: "%+%green$bold(opt$date)%+%"\n"))
+cat(blue("The path where input file and output file an folder is: "%+%green$bold(opt$Path)%+%"\n"))
+cat(blue("The Database info is: \n   User - "%+%green$bold(opt$user,"\n   ")
+	%+%"Password - "%+%green$bold("***************\n   ")
+	%+%"Host - "%+%green$bold(opt$host,"\n   ")
+	%+%"Password - "%+%green$bold("****\n   ")
+	%+%"DB name - "%+%green$bold(opt$dbname,"\n")))
 
 #print(opt)
 for (chain in c("16S","ITS")) {
@@ -102,14 +111,13 @@ for (chain in c("16S","ITS")) {
    filter(Reads >= 20000)
  dir.create(paste0(opt$Path,opt$date,"/NoWineseq/Good_Reads/",chain), showWarnings = FALSE, recursive = TRUE)
  write.table(GR_NWS, file = paste0(opt$Path,opt$date,"/NoWineseq/Good_Reads/",chain,"/",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
- 
- print(paste0("Finished analysis of ",chain))
+
+ cat(blue("Finished analysis of "%+%green$bold(chain)%+%"\n"))
  dbDisconnect(local_DB)
 }
 
-print("O       o O       o O       o          O       o O       o O       o")
-print("| O   o | | O   o | | O   o |  Q_STEP  | O   o | | O   o | | O   o |")
-print("| | O | | | | O | | | | O | |    1     | | O | | | | O | | | | O | |")
-print("| o   O | | o   O | | o   O | FINISHED | o   O | | o   O | | o   O |")
-print("o       O o       O o       O          o       O o       O o       O")
-
+cat(magenta$bold("O       o O       o O       o          O       o O       o O       o\n"))
+cat(magenta$bold("| O   o | | O   o | | O   o |  Q_STEP  | O   o | | O   o | | O   o |\n"))
+cat(magenta$bold("| | O | | | | O | | | | O | |    1     | | O | | | | O | | | | O | |\n"))
+cat(magenta$bold("| o   O | | o   O | | o   O | FINISHED | o   O | | o   O | | o   O |\n"))
+cat(magenta$bold("o       O o       O o       O          o       O o       O o       O\n"))

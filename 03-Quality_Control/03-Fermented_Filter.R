@@ -1,6 +1,7 @@
 library(optparse)
 library(dplyr)
 library(RPostgreSQL)
+library(crayon)
 
 #########################################################################################
 ###     Cargar argumentos//Load arguments      ###
@@ -26,6 +27,14 @@ option_list <- list(
 
 ### Load arguments
 opt <- parse_args(OptionParser(option_list=option_list))
+
+cat(blue("Run date to analyze is: "%+%green$bold(opt$date)%+%"\n"))
+cat(blue("The path where input file and output file an folder is: "%+%green$bold(opt$Path)%+%"\n"))
+cat(blue("The Database info is: \n   User - "%+%green$bold(opt$user,"\n   ")
+        %+%"Password - "%+%green$bold("***************\n   ")
+        %+%"Host - "%+%green$bold(opt$host,"\n   ")
+        %+%"Password - "%+%green$bold("****\n   ")
+        %+%"DB name - "%+%green$bold(opt$dbname,"\n")))
 
 ##### FUNCTIONS
 Stage_Substage <- function(Muestra,conexion) 
@@ -97,7 +106,7 @@ for (chain in c("16S","ITS")) {
               ignore.case = FALSE, include.dirs = FALSE, no.. = FALSE)
    F_Date <- gsub("^.*?_","",F_Date[length(F_Date)])
  }
-
+ cat(blue("Control files used in "%+%chain%+%" are on date: "%+%green$bold(F_Date)%+%"\n"))
  if (chain == "ITS") {
    Fungus <- data.frame()
    for(i in as.character(Reads$Sample)) {
@@ -391,12 +400,11 @@ for (chain in c("16S","ITS")) {
    write.table(Bacteria, file = paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Fermented/",chain,"/Informs/Good_Fer_",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
  }
  dbDisconnect(local_DB)
- print(paste0("Finished analysis of ",chain))
+ cat(blue("Finished analysis of "%+%green$bold(chain)%+%"\n"))
 }
 
-print("O       o O       o O       o          O       o O       o O       o")
-print("| O   o | | O   o | | O   o |  Q_STEP  | O   o | | O   o | | O   o |")
-print("| | O | | | | O | | | | O | |    3     | | O | | | | O | | | | O | |")
-print("| o   O | | o   O | | o   O | FINISHED | o   O | | o   O | | o   O |")
-print("o       O o       O o       O          o       O o       O o       O")
-
+cat(magenta$bold("O       o O       o O       o          O       o O       o O       o\n"))
+cat(magenta$bold("| O   o | | O   o | | O   o |  Q_STEP  | O   o | | O   o | | O   o |\n"))
+cat(magenta$bold("| | O | | | | O | | | | O | |    3     | | O | | | | O | | | | O | |\n"))
+cat(magenta$bold("| o   O | | o   O | | o   O | FINISHED | o   O | | o   O | | o   O |\n"))
+cat(magenta$bold("o       O o       O o       O          o       O o       O o       O\n"))
