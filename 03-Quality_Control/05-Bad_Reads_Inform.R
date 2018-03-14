@@ -61,43 +61,46 @@ for (chain in c("16S","ITS")) {
 
  ##### FILE LOAD
  ### Runs del projecto
- File <- read.csv(paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_Reads_Raw.csv"))
- File$Sample <- gsub("\\-",".",File$Sample)
- File$ws_sample_name <- substring(File$Sample, 1, 6)
- ### Selection od samples in abundance file that match with Reads file
- OTUs <- read.csv(paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_Abundance.csv"))
- MUESTRAS <- colnames(File)
-
- ##### ANALYSIS
- Samps_types <- paste0("select muestra.c_muestra_wineseq, tipo_muestra.d_tipo_muestra from muestra, tipo_muestra
-                       where muestra.c_tipo_muestra = tipo_muestra.c_tipo_muestra
-                       order by c_muestra_wineseq")
- 
- Tipos_muestra <- dbGetQuery(local_DB, Samps_types)
- colnames(Tipos_muestra) <- c("ws_sample_name", "tipo_muestra")
- 
- Bad_Reads_number <- File %>%
-   filter(Reads < 20000)
- Bad_Reads_number <- merge(Tipos_muestra, Bad_Reads_number) %>%
-   filter(!grepl("BMKCPF",ws_sample_name))
- 
- Bad_Samples <- OTUs %>%
-   select(Species, one_of(as.character(Bad_Reads_number$Sample)))
- 
- BadReadstxt <- data.frame()
- for(i in as.character(Bad_Reads_number$Sample)) {
-   Samp_data <- Sample_Row(i)
-   Samp <- Bad_Samples %>%
-     select_(.dots = i,"Species") %>%
-     filter_(.dots = paste0(i, "> 0"))
-   Reads_finales <- sum(Samp[i])
-   TXT <- TEXTO(i, Samp_data, chain, opt$date, Reads_finales, "BAD")
-   BadReadstxt <- rbind(BadReadstxt, TXT)
- }
- dir.create(paste0(opt$Path,opt$date,"/Bad_Reads/",chain,"/Informs/"), showWarnings = FALSE, recursive = TRUE)
- write.table(BadReadstxt, file = paste0(opt$Path,opt$date,"/Bad_Reads/",chain,"/Informs/Bad_Reads_",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
- cat(blue("Finished analysis of "%+%green$bold(chain)%+%"\n"))
- dbDisconnect(local_DB)
+#  if (file.exists(paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_Reads_Raw.csv")) == TRUE ) {
+   File <- read.csv(paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_Reads_Raw.csv"))
+   File$Sample <- gsub("\\-",".",File$Sample)
+   File$ws_sample_name <- substring(File$Sample, 1, 6)
+   ### Selection od samples in abundance file that match with Reads file
+   OTUs <- read.csv(paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_Abundance.csv"))
+   MUESTRAS <- colnames(File)
+  
+   ##### ANALYSIS
+   Samps_types <- paste0("select muestra.c_muestra_wineseq, tipo_muestra.d_tipo_muestra from muestra, tipo_muestra
+                         where muestra.c_tipo_muestra = tipo_muestra.c_tipo_muestra
+                         order by c_muestra_wineseq")
+   
+   Tipos_muestra <- dbGetQuery(local_DB, Samps_types)
+   colnames(Tipos_muestra) <- c("ws_sample_name", "tipo_muestra")
+   
+   Bad_Reads_number <- File %>%
+     filter(Reads < 20000)
+   Bad_Reads_number <- merge(Tipos_muestra, Bad_Reads_number) %>%
+     filter(!grepl("BMKCPF",ws_sample_name))
+   
+   Bad_Samples <- OTUs %>%
+     select(Species, one_of(as.character(Bad_Reads_number$Sample)))
+   
+   BadReadstxt <- data.frame()
+   for(i in as.character(Bad_Reads_number$Sample)) {
+     Samp_data <- Sample_Row(i)
+     Samp <- Bad_Samples %>%
+       select_(.dots = i,"Species") %>%
+       filter_(.dots = paste0(i, "> 0"))
+     Reads_finales <- sum(Samp[i])
+     TXT <- TEXTO(i, Samp_data, chain, opt$date, Reads_finales, "BAD")
+     BadReadstxt <- rbind(BadReadstxt, TXT)
+   }
+   dir.create(paste0(opt$Path,opt$date,"/Bad_Reads/",chain,"/Informs/"), showWarnings = FALSE, recursive = TRUE)
+   write.table(BadReadstxt, file = paste0(opt$Path,opt$date,"/Bad_Reads/",chain,"/Informs/Bad_Reads_",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
+   cat(blue("Finished analysis of "%+%green$bold(chain)%+%"\n"))
+   dbDisconnect(local_DB)
+ # } else {
+ #   cat(red$boild(paste0("\n Dont have files needeed to analyze ",chain,"\n")))
 } 
 
 cat(magenta$bold("O       o O       o O       o          O       o O       o O       o\n"))

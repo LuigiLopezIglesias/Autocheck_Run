@@ -45,75 +45,79 @@ for (chain in c("16S","ITS")) {
 
  ##### FILE LOAD
  ### Runs del projecto
- File <- read.csv(paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_Reads_Raw.csv"))
- MUESTRAS <- File$Sample
- File$ws_sample_name <- gsub('-.*', '', File$Sample)
- 
- File$ws_sample_name <- gsub('b.*', '', File$ws_sample_name) 
- 
- #### ANALYSIS
- WS_Samps <- paste0("select muestra.c_muestra_wineseq, tipo_muestra.d_tipo_muestra from muestra, tipo_muestra
-                    where muestra.c_tipo_muestra = tipo_muestra.c_tipo_muestra
-                    and (tipo_muestra.d_tipo_muestra = 'Soil'
-                    or tipo_muestra.d_tipo_muestra = 'Grape'
-                    or tipo_muestra.d_tipo_muestra = 'Fermented')
-                    order by c_muestra_wineseq")
- 
- WineSeq <- dbGetQuery(local_DB, WS_Samps)
- colnames(WineSeq) <- c("ws_sample_name", "tipo_muestra")
- 
- NWS_Samps <- paste0("select muestra.c_muestra_wineseq, tipo_muestra.d_tipo_muestra from muestra, tipo_muestra
-                     where muestra.c_tipo_muestra = tipo_muestra.c_tipo_muestra
-                     and (tipo_muestra.d_tipo_muestra != 'Soil'
-                     and tipo_muestra.d_tipo_muestra != 'Grape'
-                     and tipo_muestra.d_tipo_muestra != 'Fermented')
-                     order by c_muestra_wineseq")
- 
- NoWineSeq <- dbGetQuery(local_DB, NWS_Samps)
- colnames(NoWineSeq) <- c("ws_sample_name", "tipo_muestra")
- 
- ### Separacion muestras WS y NWS
- WS <- merge(File, WineSeq)
- NWS <- merge(File, NoWineSeq)
- 
- 
- ### Separacion de muestras con Bajo reads de buen numero de reads (profundidad)
- ###~~ Muestras Wineseq
- BR_WS <- WS %>%
-   filter(Reads < 20000)
- dir.create(paste0(opt$Path,opt$date,"/Wineseq/Bad_Reads/",chain), showWarnings = FALSE, recursive = TRUE)
- write.table(BR_WS, file = paste0(opt$Path,opt$date,"/Wineseq/Bad_Reads/",chain,"/",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
- 
- GR_WS <- WS %>%
-   filter(Reads >= 20000)
- 
- ###-- Separacion por tipo de muestra 
- ## Suelo uva
- ST_WS <- GR_WS %>%
-   filter(tipo_muestra %in% c('Soil','Grape'))
- dir.create(paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Soil_Grape/",chain), showWarnings = FALSE, recursive = TRUE)
- write.table(ST_WS, file = paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Soil_Grape/",chain,"/",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
- 
- ## Fermentados
- FER_WS <- GR_WS %>%
-   filter(tipo_muestra %in% 'Fermented')
- dir.create(paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Fermented/",chain), showWarnings = FALSE, recursive = TRUE)
- write.table(FER_WS, file = paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Fermented/",chain,"/",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
- 
- ##~~ Muestras no Wineseq
- 
- BR_NWS <- NWS %>%
-   filter(Reads < 20000)
- dir.create(paste0(opt$Path,opt$date,"/NoWineseq/Bad_Reads/",chain), showWarnings = FALSE, recursive = TRUE)
- write.table(BR_NWS, file = paste0(opt$Path,opt$date,"/NoWineseq/Bad_Reads/",chain,"/",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
- 
- GR_NWS <- NWS %>%
-   filter(Reads >= 20000)
- dir.create(paste0(opt$Path,opt$date,"/NoWineseq/Good_Reads/",chain), showWarnings = FALSE, recursive = TRUE)
- write.table(GR_NWS, file = paste0(opt$Path,opt$date,"/NoWineseq/Good_Reads/",chain,"/",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
-
- cat(blue("Finished analysis of "%+%green$bold(chain)%+%"\n"))
- dbDisconnect(local_DB)
+ if (file.exists(paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_mapped_reads_tax.biom")) == TRUE) {
+   File <- read.csv(paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_Reads_Raw.csv"))
+   MUESTRAS <- File$Sample
+   File$ws_sample_name <- gsub('-.*', '', File$Sample)
+   
+   File$ws_sample_name <- gsub('b.*', '', File$ws_sample_name) 
+   
+   #### ANALYSIS
+   WS_Samps <- paste0("select muestra.c_muestra_wineseq, tipo_muestra.d_tipo_muestra from muestra, tipo_muestra
+                      where muestra.c_tipo_muestra = tipo_muestra.c_tipo_muestra
+                      and (tipo_muestra.d_tipo_muestra = 'Soil'
+                      or tipo_muestra.d_tipo_muestra = 'Grape'
+                      or tipo_muestra.d_tipo_muestra = 'Fermented')
+                      order by c_muestra_wineseq")
+   
+   WineSeq <- dbGetQuery(local_DB, WS_Samps)
+   colnames(WineSeq) <- c("ws_sample_name", "tipo_muestra")
+   
+   NWS_Samps <- paste0("select muestra.c_muestra_wineseq, tipo_muestra.d_tipo_muestra from muestra, tipo_muestra
+                       where muestra.c_tipo_muestra = tipo_muestra.c_tipo_muestra
+                       and (tipo_muestra.d_tipo_muestra != 'Soil'
+                       and tipo_muestra.d_tipo_muestra != 'Grape'
+                       and tipo_muestra.d_tipo_muestra != 'Fermented')
+                       order by c_muestra_wineseq")
+   
+   NoWineSeq <- dbGetQuery(local_DB, NWS_Samps)
+   colnames(NoWineSeq) <- c("ws_sample_name", "tipo_muestra")
+   
+   ### Separacion muestras WS y NWS
+   WS <- merge(File, WineSeq)
+   NWS <- merge(File, NoWineSeq)
+   
+   
+   ### Separacion de muestras con Bajo reads de buen numero de reads (profundidad)
+   ###~~ Muestras Wineseq
+   BR_WS <- WS %>%
+     filter(Reads < 20000)
+   dir.create(paste0(opt$Path,opt$date,"/Wineseq/Bad_Reads/",chain), showWarnings = FALSE, recursive = TRUE)
+   write.table(BR_WS, file = paste0(opt$Path,opt$date,"/Wineseq/Bad_Reads/",chain,"/",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
+   
+   GR_WS <- WS %>%
+     filter(Reads >= 20000)
+   
+   ###-- Separacion por tipo de muestra 
+   ## Suelo uva
+   ST_WS <- GR_WS %>%
+     filter(tipo_muestra %in% c('Soil','Grape'))
+   dir.create(paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Soil_Grape/",chain), showWarnings = FALSE, recursive = TRUE)
+   write.table(ST_WS, file = paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Soil_Grape/",chain,"/",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
+   
+   ## Fermentados
+   FER_WS <- GR_WS %>%
+     filter(tipo_muestra %in% 'Fermented')
+   dir.create(paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Fermented/",chain), showWarnings = FALSE, recursive = TRUE)
+   write.table(FER_WS, file = paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Fermented/",chain,"/",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
+   
+   ##~~ Muestras no Wineseq
+   
+   BR_NWS <- NWS %>%
+     filter(Reads < 20000)
+   dir.create(paste0(opt$Path,opt$date,"/NoWineseq/Bad_Reads/",chain), showWarnings = FALSE, recursive = TRUE)
+   write.table(BR_NWS, file = paste0(opt$Path,opt$date,"/NoWineseq/Bad_Reads/",chain,"/",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
+   
+   GR_NWS <- NWS %>%
+     filter(Reads >= 20000)
+   dir.create(paste0(opt$Path,opt$date,"/NoWineseq/Good_Reads/",chain), showWarnings = FALSE, recursive = TRUE)
+   write.table(GR_NWS, file = paste0(opt$Path,opt$date,"/NoWineseq/Good_Reads/",chain,"/",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
+  
+   cat(blue("Finished analysis of "%+%green$bold(chain)%+%"\n"))
+   dbDisconnect(local_DB)
+  } else {
+    cat(red$bold(paste0("\n Dont have files needed to analyze ",chain,"\n")))
+  }
 }
 
 cat(magenta$bold("O       o O       o O       o          O       o O       o O       o\n"))

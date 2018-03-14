@@ -46,66 +46,70 @@ TEXTO_bmk <- function(Muestra, Sample_type, Cadena, Projecto, Reads_F, Sps_Contr
 for (chain in c("16S","ITS")) {
  ### ARCHIVOS
  ### Muestras de BMK que pasan el corte de reads
- Reads <- read.csv(paste0(opt$Path,opt$date,"/NoWineseq/Good_Reads/",chain,"/",opt$date,"_",chain,".csv"))
- Reads$Sample <- gsub("\\-",".",Reads$Sample)
- 
- ### seleccion de muestras que estan en Reads
- OTUs <- read.csv(paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_Abundance.csv"))
- BMK_GR<- OTUs %>%
-   select(Species, one_of(as.character(Reads$Sample)))
- 
- if (chain == "ITS") {
-   BMK <- data.frame()
-   for(i in Reads$Sample) {
-     Samp_data <- BMK_Row(i)
-     Samp <- BMK_Gr(i)
-     Reads_Finales <- sum(Samp[i])
-     Samp[i] <- round((Samp[i]/sum(Samp[i]))*100, digits = 7)
-     TOP_10 <- Samp %>% 
-       arrange_(.dots = paste0("desc(",i,")")) %>%
-       slice(1:10)
-     Fun_control <- TOP_10 %>%
-       filter(grepl("Malassezia|Epicoccum",Species))  ## <- Add contamination Sp
-     Control <- ifelse(nrow(Fun_control) > 0 ,
-                       ifelse(sum(Fun_control[1]) > 5,
-                              "High",
-                              "Low"),
-                       "Low")
-     Result <- ifelse(Control == "High",
-                      "REVIEW",
-                      "GOOD")
-     TXT <- TEXTO_bmk(i, Samp_data, chain, opt$date, Reads_Finales, Control, Samp, TOP_10, Result)
-     BMK <- rbind(BMK,TXT)
+ if(file.exists(paste0(opt$Path,opt$date,"/NoWineseq/Good_Reads/",chain,"/",opt$date,"_",chain,".csv"))== TRUE) {
+   Reads <- read.csv(paste0(opt$Path,opt$date,"/NoWineseq/Good_Reads/",chain,"/",opt$date,"_",chain,".csv"))
+   Reads$Sample <- gsub("\\-",".",Reads$Sample)
+   
+   ### seleccion de muestras que estan en Reads
+   OTUs <- read.csv(paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_Abundance.csv"))
+   BMK_GR<- OTUs %>%
+     select(Species, one_of(as.character(Reads$Sample)))
+   
+   if (chain == "ITS") {
+     BMK <- data.frame()
+     for(i in Reads$Sample) {
+       Samp_data <- BMK_Row(i)
+       Samp <- BMK_Gr(i)
+       Reads_Finales <- sum(Samp[i])
+       Samp[i] <- round((Samp[i]/sum(Samp[i]))*100, digits = 7)
+       TOP_10 <- Samp %>% 
+         arrange_(.dots = paste0("desc(",i,")")) %>%
+         slice(1:10)
+       Fun_control <- TOP_10 %>%
+         filter(grepl("Malassezia|Epicoccum",Species))  ## <- Add contamination Sp
+       Control <- ifelse(nrow(Fun_control) > 0 ,
+                         ifelse(sum(Fun_control[1]) > 5,
+                                "High",
+                                "Low"),
+                         "Low")
+       Result <- ifelse(Control == "High",
+                        "REVIEW",
+                        "GOOD")
+       TXT <- TEXTO_bmk(i, Samp_data, chain, opt$date, Reads_Finales, Control, Samp, TOP_10, Result)
+       BMK <- rbind(BMK,TXT)
+     }
+   } else {
+     BMK <- data.frame()
+     for(i in Reads$Sample) {
+       Samp_data <- BMK_Row(i)
+       Samp <- BMK_Gr(i)
+       Reads_Finales <- sum(Samp[i])
+       Samp[i] <- round((Samp[i]/sum(Samp[i]))*100, digits = 7)
+       TOP_10 <- Samp %>% 
+         arrange_(.dots = paste0("desc(",i,")")) %>% 
+         slice(1:10)
+       ###### Si aparece alguno para usar como control volver a usar
+       #Bac_control <- TOP_10 %>%
+       #  filter(grepl("Nitrososphaera",Species))  ## <- Add contamination Sp
+       #Control <- ifelse(nrow(Bac_control) > 0 ,
+       #                  ifelse(sum(Bac_control[1]) > 5,
+       #                         "High",
+       #                         "Low"),
+       #                  "Low")
+       Control <- "Low"
+       Result <- ifelse(Control == "High",
+                        "REVIEW",
+                        "GOOD")
+       TXT <- TEXTO_bmk(i, Samp_data, chain, opt$date,  Reads_Finales, Control, Samp, TOP_10, Result)
+       BMK <- rbind(BMK,TXT)
+     }
    }
- } else {
-   BMK <- data.frame()
-   for(i in Reads$Sample) {
-     Samp_data <- BMK_Row(i)
-     Samp <- BMK_Gr(i)
-     Reads_Finales <- sum(Samp[i])
-     Samp[i] <- round((Samp[i]/sum(Samp[i]))*100, digits = 7)
-     TOP_10 <- Samp %>% 
-       arrange_(.dots = paste0("desc(",i,")")) %>% 
-       slice(1:10)
-     ###### Si aparece alguno para usar como control volver a usar
-     #Bac_control <- TOP_10 %>%
-     #  filter(grepl("Nitrososphaera",Species))  ## <- Add contamination Sp
-     #Control <- ifelse(nrow(Bac_control) > 0 ,
-     #                  ifelse(sum(Bac_control[1]) > 5,
-     #                         "High",
-     #                         "Low"),
-     #                  "Low")
-     Control <- "Low"
-     Result <- ifelse(Control == "High",
-                      "REVIEW",
-                      "GOOD")
-     TXT <- TEXTO_bmk(i, Samp_data, chain, opt$date,  Reads_Finales, Control, Samp, TOP_10, Result)
-     BMK <- rbind(BMK,TXT)
-   }
- }
- dir.create(paste0(opt$Path,opt$date,"/NoWineseq/Good_Reads/",chain,"/Informs/"), showWarnings = FALSE, recursive = TRUE)
- write.table(BMK, file = paste0(opt$Path,opt$date,"/NoWineseq/Good_Reads/",chain,"/Informs/Good_BMK_",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
- cat(blue("Finished analysis of "%+%green$bold(chain)%+%"\n"))
+   dir.create(paste0(opt$Path,opt$date,"/NoWineseq/Good_Reads/",chain,"/Informs/"), showWarnings = FALSE, recursive = TRUE)
+   write.table(BMK, file = paste0(opt$Path,opt$date,"/NoWineseq/Good_Reads/",chain,"/Informs/Good_BMK_",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
+   cat(blue("Finished analysis of "%+%green$bold(chain)%+%"\n"))
+  } else {
+    cat(red$bold(paste0("\n Dont have files needed to analyze ",chain,"\n")))
+  }
 }
 
 cat(magenta$bold("O       o O       o O       o          O       o O       o O       o\n"))

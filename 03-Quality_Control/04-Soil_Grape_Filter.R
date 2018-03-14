@@ -53,276 +53,280 @@ TEXTO_Soil_Grape <- function(Muestra, Sample_type, Cadena, Projecto, Reads_F, Sp
 for (chain in c("16S","ITS")) {
  ##### FILE LOAD
  ### Fermentative samples that pass the reads number limit
- Reads <- read.csv(paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Soil_Grape/",chain,"/",opt$date,"_",chain,".csv"))
- Reads$Sample <- gsub("\\-",".",Reads$Sample)
-
- ### Selection od samples in abundance file that match with Reads file
- OTUs <- read.csv(paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_Abundance.csv"))
- Samp_GR <- OTUs %>%
-   select(Species, one_of(as.character(Reads$Sample)))
-
- if (chain == "ITS") {
-   Fun_Soil_Grape <- data.frame()
-   for(i in as.character(Reads$Sample)) {
-     ### Sample selection
-     Samp <- Sample_Gr(i)
-     Reads_Finales <- sum(Samp[i])
-     Samp[i] <- round((Samp[i]/sum(Samp[i]))*100, digits = 7)
-     Samp_data <- Sample_Row(i)
-     statistics <- Samp %>% summarise(num_sp = n(),
-                                      max = max(Samp[i]))
-      ### Filter collection selection
-      Filt_Path <- paste0(getwd(),"/03-Quality_Control/Filter_Parameters/",chain,"/")
-      if (!is.null(opt$filtDate)) {
-        F_Date <- opt$filtDate
-      } else {
-        F_Date <- list.files(path = Filt_Path,
-                   pattern = as.character(Samp_data$tipo_muestra), all.files = FALSE,
-                   full.names = FALSE, recursive = FALSE,
-                   ignore.case = FALSE, include.dirs = FALSE, no.. = FALSE)
-        F_Date <- gsub("^.*?_","",F_Date[length(F_Date)])
-      }
-      cat(blue("Control files used in "%+%chain%+%" are on date: "%+%green$bold(F_Date)%+%"\n"))
-     ### Contamination check
-     TOP_10 <- Samp %>% 
-       arrange_(.dots = paste0("desc(",i,")")) %>% 
-       slice(1:10)
-     Fun_control <- TOP_10 %>%
-       filter(grepl("Malassezia|Epicoccum",Species))
-     Control <- ifelse(nrow(Fun_control) > 0 ,
-                       ifelse(sum(Fun_control[1]) > 5,
-                              "High",
-                              "Low"),
-                       "Low")
-     ### Limits files
-     Limits <- read.csv(paste0(Filt_Path,Samp_data$tipo_muestra,"_",F_Date,"/limit_Species_",chain,"_",Samp_data$tipo_muestra,".csv"))
-     Limits <- Limits %>%
-       select(genus_specie, avg_PER, sd) %>%
-       `colnames<-`(c("Species", "avg_PER", "sd"))
-     Num_SP_control <- Limits %>% summarise(num_sp = n())
-     mean <- read.csv(paste0(Filt_Path,Samp_data$tipo_muestra,"_",F_Date,"/number_Species_",chain,"_",Samp_data$tipo_muestra,".csv"))
-     MAX <- read.csv(paste0(Filt_Path,Samp_data$tipo_muestra,"_",F_Date,"/max_Species_",chain,"_",Samp_data$tipo_muestra,".csv"))
-     ### Species number analysis
-     SpeciesNUM <- ifelse(statistics[,1] < (mean[2]-mean[3]), 
-                          "Low", 
-                          "GOOD")
-     ### Abundance specie analysis
-     SPMAX <- Samp %>%
-       filter_(.dots = paste0(i,"==",statistics[,2]))
-     SpeciesMAX <- ifelse(grepl(" sp",SPMAX[1,2]),
-                          ifelse(statistics[,2] > (MAX[2]+(2*MAX[3])*100), #<- cambiar para diferentes sd con sp. 
-                                 "ALERT", 
-                                 "GOOD"),
-                          ifelse(statistics[,2] > (MAX[2]+MAX[3]*100), 
-                                 "ALERT", 
-                                 "GOOD"))
-     ### Analisis especies control
-     limit_x <- Num_SP_control[,1]*10/100 #limite en eje para muy graves
-     limit_y <- Num_SP_control[,1]*20/100 #limite en eje para normales
-     
-     Area_control <- ((limit_x*limit_y) - limit_x^2)
-     
-     ### Analisis con especies control de muestra
-     comparaTION <- merge(Samp, Limits)
-     Num_SP_CM <- comparaTION %>%
-       summarise(number = n())
-     
-     if (Num_SP_CM[,1] < (Num_SP_control[,1]/2)) {
-       Samp_data$tipo_muestra <- paste0("Isn't ",Samp_data$tipo_muestra)
-       ControlSpecies <- "Have less than 50% of Sp"
-       Diagnostic <- "REVIEW"
-     }else {
-       ### Filtro para Genero sp.
-       Genero_sp <- comparaTION %>%
-         filter(grepl(" sp", Species))
+  if (file.exists(paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Soil_Grape/",chain,"/",opt$date,"_",chain,".csv")) == TRUE )  {
+   Reads <- read.csv(paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Soil_Grape/",chain,"/",opt$date,"_",chain,".csv"))
+   Reads$Sample <- gsub("\\-",".",Reads$Sample)
+  
+   ### Selection od samples in abundance file that match with Reads file
+   OTUs <- read.csv(paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_Abundance.csv"))
+   Samp_GR <- OTUs %>%
+     select(Species, one_of(as.character(Reads$Sample)))
+  
+   if (chain == "ITS") {
+     Fun_Soil_Grape <- data.frame()
+     for(i in as.character(Reads$Sample)) {
+       ### Sample selection
+       Samp <- Sample_Gr(i)
+       Reads_Finales <- sum(Samp[i])
+       Samp[i] <- round((Samp[i]/sum(Samp[i]))*100, digits = 7)
+       Samp_data <- Sample_Row(i)
+       statistics <- Samp %>% summarise(num_sp = n(),
+                                        max = max(Samp[i]))
+        ### Filter collection selection
+        Filt_Path <- paste0(getwd(),"/03-Quality_Control/Filter_Parameters/",chain,"/")
+        if (!is.null(opt$filtDate)) {
+          F_Date <- opt$filtDate
+        } else {
+          F_Date <- list.files(path = Filt_Path,
+                     pattern = as.character(Samp_data$tipo_muestra), all.files = FALSE,
+                     full.names = FALSE, recursive = FALSE,
+                     ignore.case = FALSE, include.dirs = FALSE, no.. = FALSE)
+          F_Date <- gsub("^.*?_","",F_Date[length(F_Date)])
+        }
+        cat(blue("Control files used in "%+%chain%+%" are on date: "%+%green$bold(F_Date)%+%"\n"))
+       ### Contamination check
+       TOP_10 <- Samp %>% 
+         arrange_(.dots = paste0("desc(",i,")")) %>% 
+         slice(1:10)
+       Fun_control <- TOP_10 %>%
+         filter(grepl("Malassezia|Epicoccum",Species))
+       Control <- ifelse(nrow(Fun_control) > 0 ,
+                         ifelse(sum(Fun_control[1]) > 5,
+                                "High",
+                                "Low"),
+                         "Low")
+       ### Limits files
+       Limits <- read.csv(paste0(Filt_Path,Samp_data$tipo_muestra,"_",F_Date,"/limit_Species_",chain,"_",Samp_data$tipo_muestra,".csv"))
+       Limits <- Limits %>%
+         select(genus_specie, avg_PER, sd) %>%
+         `colnames<-`(c("Species", "avg_PER", "sd"))
+       Num_SP_control <- Limits %>% summarise(num_sp = n())
+       mean <- read.csv(paste0(Filt_Path,Samp_data$tipo_muestra,"_",F_Date,"/number_Species_",chain,"_",Samp_data$tipo_muestra,".csv"))
+       MAX <- read.csv(paste0(Filt_Path,Samp_data$tipo_muestra,"_",F_Date,"/max_Species_",chain,"_",Samp_data$tipo_muestra,".csv"))
+       ### Species number analysis
+       SpeciesNUM <- ifelse(statistics[,1] < (mean[2]-mean[3]), 
+                            "Low", 
+                            "GOOD")
+       ### Abundance specie analysis
+       SPMAX <- Samp %>%
+         filter_(.dots = paste0(i,"==",statistics[,2]))
+       SpeciesMAX <- ifelse(grepl(" sp",SPMAX[1,2]),
+                            ifelse(statistics[,2] > (MAX[2]+(2*MAX[3])*100), #<- cambiar para diferentes sd con sp. 
+                                   "ALERT", 
+                                   "GOOD"),
+                            ifelse(statistics[,2] > (MAX[2]+MAX[3]*100), 
+                                   "ALERT", 
+                                   "GOOD"))
+       ### Analisis especies control
+       limit_x <- Num_SP_control[,1]*10/100 #limite en eje para muy graves
+       limit_y <- Num_SP_control[,1]*20/100 #limite en eje para normales
        
-       Genero_sp <- Genero_sp %>% 
-         mutate(Norm_limit = (avg_PER + 1.5*sd)*100,
-                Alert_limit = (avg_PER + 2.5*sd)*100)
+       Area_control <- ((limit_x*limit_y) - limit_x^2)
        
-       ### Filtro para especies
-       Specie_sp <- comparaTION %>%
-         filter(!grepl(" sp", Species))
-       
-       Specie_sp <- Specie_sp %>% 
-         mutate(Norm_limit = (avg_PER + sd)*100,
-                Alert_limit = (avg_PER + 2*sd)*100)
-       
-       comparaTION <- merge(Specie_sp, Genero_sp, all = TRUE)
-       
-       comparaTION$reason <- ifelse(comparaTION[i] > comparaTION$Norm_limit, 
-                                    ifelse(comparaTION[i] > comparaTION$Alert_limit, 
-                                           "Great_problem", 
-                                           "Normal_problem"),
-                                    "No_problem")
-       
-       Problems <- comparaTION %>%
-         group_by(reason) %>%
+       ### Analisis con especies control de muestra
+       comparaTION <- merge(Samp, Limits)
+       Num_SP_CM <- comparaTION %>%
          summarise(number = n())
        
-       GP <- Problems %>%
-         filter(reason == "Great_problem") %>%
-         summarise(n = sum(number))
+       if (Num_SP_CM[,1] < (Num_SP_control[,1]/2)) {
+         Samp_data$tipo_muestra <- paste0("Isn't ",Samp_data$tipo_muestra)
+         ControlSpecies <- "Have less than 50% of Sp"
+         Diagnostic <- "REVIEW"
+       }else {
+         ### Filtro para Genero sp.
+         Genero_sp <- comparaTION %>%
+           filter(grepl(" sp", Species))
+         
+         Genero_sp <- Genero_sp %>% 
+           mutate(Norm_limit = (avg_PER + 1.5*sd)*100,
+                  Alert_limit = (avg_PER + 2.5*sd)*100)
+         
+         ### Filtro para especies
+         Specie_sp <- comparaTION %>%
+           filter(!grepl(" sp", Species))
+         
+         Specie_sp <- Specie_sp %>% 
+           mutate(Norm_limit = (avg_PER + sd)*100,
+                  Alert_limit = (avg_PER + 2*sd)*100)
+         
+         comparaTION <- merge(Specie_sp, Genero_sp, all = TRUE)
+         
+         comparaTION$reason <- ifelse(comparaTION[i] > comparaTION$Norm_limit, 
+                                      ifelse(comparaTION[i] > comparaTION$Alert_limit, 
+                                             "Great_problem", 
+                                             "Normal_problem"),
+                                      "No_problem")
+         
+         Problems <- comparaTION %>%
+           group_by(reason) %>%
+           summarise(number = n())
+         
+         GP <- Problems %>%
+           filter(reason == "Great_problem") %>%
+           summarise(n = sum(number))
+         
+         NP <- Problems %>%
+           filter(reason == "Normal_problem") %>%
+           summarise(n = sum(number))
+         
+         Area_problema <- (((-2*GP[,1]-NP[,1])/-2) * (NP[,1]-(-2*GP[,1])))-(((-2*GP[,1]-NP[,1])/-2)^2)
+         
+         ControlSpecies <- ifelse(Area_control < Area_problema[,1], 
+                                  "ALERT", 
+                                  "GOOD")
+         
+         ### hay que cambiarlo por todo el proceso de control de integrales y rectas
+         Diagnostic <- ifelse(SpeciesMAX  == "GOOD", 
+                              ifelse(ControlSpecies == "GOOD", 
+                                     ifelse(SpeciesNUM == "GOOD", 
+                                            "GOOD", 
+                                            "REVIEW"),
+                                     "REVIEW"),
+                              "REVIEW")
+       }
        
-       NP <- Problems %>%
-         filter(reason == "Normal_problem") %>%
-         summarise(n = sum(number))
-       
-       Area_problema <- (((-2*GP[,1]-NP[,1])/-2) * (NP[,1]-(-2*GP[,1])))-(((-2*GP[,1]-NP[,1])/-2)^2)
-       
-       ControlSpecies <- ifelse(Area_control < Area_problema[,1], 
-                                "ALERT", 
-                                "GOOD")
-       
-       ### hay que cambiarlo por todo el proceso de control de integrales y rectas
-       Diagnostic <- ifelse(SpeciesMAX  == "GOOD", 
-                            ifelse(ControlSpecies == "GOOD", 
-                                   ifelse(SpeciesNUM == "GOOD", 
-                                          "GOOD", 
-                                          "REVIEW"),
-                                   "REVIEW"),
-                            "REVIEW")
+       TXT <- TEXTO_Soil_Grape(i, Samp_data, chain, opt$date, Reads_Finales, Control, Samp, TOP_10, SpeciesNUM, SpeciesMAX, ControlSpecies, Diagnostic)
+       Fun_Soil_Grape <- rbind(Fun_Soil_Grape,TXT)
      }
-     
-     TXT <- TEXTO_Soil_Grape(i, Samp_data, chain, opt$date, Reads_Finales, Control, Samp, TOP_10, SpeciesNUM, SpeciesMAX, ControlSpecies, Diagnostic)
-     Fun_Soil_Grape <- rbind(Fun_Soil_Grape,TXT)
-   }
-   dir.create(paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Soil_Grape/",chain,"/Informs/"), showWarnings = FALSE, recursive = TRUE)
-   write.table(Fun_Soil_Grape, file = paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Soil_Grape/",chain,"/Informs/Good_SoilGrape_",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
- } else {
-   Bac_Soil_Grape <- data.frame()
-   for(i in as.character(Reads$Sample)) {
-     ### Sample selection
-     Samp <- Sample_Gr(i)
-     Reads_Finales <- sum(Samp[i])
-     Samp[i] <- round((Samp[i]/sum(Samp[i]))*100, digits = 7)
-     Samp_data <- Sample_Row(i)
-     statistics <- Samp %>% summarise(num_sp = n(),
-                                      max = max(Samp[i]))
-
-     ### Filter collection selection
-     Filt_Path <- paste0(getwd(),"/03-Quality_Control/Filter_Parameters/",chain,"/")
-     if (!is.null(opt$filtDate)) {
-       F_Date <- opt$filtDate
-     } else {
-       F_Date <- list.files(path = Filt_Path,
-                  pattern = as.character(Samp_data$tipo_muestra), all.files = FALSE,
-                  full.names = FALSE, recursive = FALSE,
-                  ignore.case = FALSE, include.dirs = FALSE, no.. = TRUE)
-       F_Date <- gsub("^.*?_","",F_Date[length(F_Date)])
-     }
-     cat(blue("Control files used in "%+%chain%+%" are on date: "%+%green$bold(F_Date)%+%"\n"))
-     ### Contamination check
-     TOP_10 <- Samp %>% 
-       arrange_(.dots = paste0("desc(",i,")")) %>% 
-       slice(1:10)
-     ### Si aparece algun MO contaminate ponerlo
-     #Bac_control <- TOP_10 %>%
-     #  filter(grepl("Nitrososphaera",Species))   ## <- Add contamination Sp
-     #Control <- ifelse(nrow(Bac_control) > 0 ,
-     #                  ifelse(sum(Bac_control[1]) > 5,
-     #                         "High",
-     #                         "Low"),
-     #                  "Low")
-     Control <- "Low"
-     ### Limits files
-     Limits <- read.csv(paste0(Filt_Path,Samp_data$tipo_muestra,"_",F_Date,"/limit_Species_",chain,"_",Samp_data$tipo_muestra,".csv"))
-     Limits <- Limits %>%
-       select(genus_specie, avg_PER, sd) %>%
-       `colnames<-`(c("Species", "avg_PER", "sd"))
-     Num_SP_control <- Limits %>% summarise(num_sp = n())
-     mean <- read.csv(paste0(Filt_Path,Samp_data$tipo_muestra,"_",F_Date,"/number_Species_",chain,"_",Samp_data$tipo_muestra,".csv"))
-     MAX <- read.csv(paste0(Filt_Path,Samp_data$tipo_muestra,"_",F_Date,"/max_Species_",chain,"_",Samp_data$tipo_muestra,".csv"))
-     ### Species number analysis
-     SpeciesNUM <- ifelse(statistics[,1] < (mean[2]-mean[3]), 
-                          "Low", 
-                          "GOOD")
-     ### Abundance specie analysis
-     SPMAX <- Samp %>%
-       filter_(.dots = paste0(i,"==",statistics[,2]))
-     
-     SpeciesMAX <- ifelse(grepl(" sp",SPMAX[1,2]),
-                          ifelse(statistics[,2] > ((MAX[2]+(2*MAX[3]))*100), #<- cambiar para diferentes sd con sp. 
-                                 "ALERT", 
-                                 "GOOD"),
-                          ifelse(statistics[,2] > (MAX[2]+MAX[3]*100), 
-                                 "ALERT", 
-                                 "GOOD"))
-     ### Analisis especies control
-     limit_x <- Num_SP_control[,1]*10/100 #limite en eje para muy graves
-     limit_y <- Num_SP_control[,1]*20/100 #limite en eje para normales
-     
-     Area_control <- ((limit_x*limit_y) - limit_x^2)
-     
-     ### Analisis con especies control de muestra
-     comparaTION <- merge(Samp, Limits)
-     Num_SP_CM <- comparaTION %>%
-       summarise(number = n())
-     
-     if (Num_SP_CM[,1] < (Num_SP_control[,1]/2)) {
-       Samp_data$tipo_muestra <- paste0("Isn't ",Samp_data$tipo_muestra)
-       ControlSpecies <- "Have less than 50% of Sp"
-       Diagnostic <- "REVIEW"
-     }else {
-       ### Filtro para Genero sp.
-       Genero_sp <- comparaTION %>%
-         filter(grepl(" sp", Species))
+     dir.create(paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Soil_Grape/",chain,"/Informs/"), showWarnings = FALSE, recursive = TRUE)
+     write.table(Fun_Soil_Grape, file = paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Soil_Grape/",chain,"/Informs/Good_SoilGrape_",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
+   } else {
+     Bac_Soil_Grape <- data.frame()
+     for(i in as.character(Reads$Sample)) {
+       ### Sample selection
+       Samp <- Sample_Gr(i)
+       Reads_Finales <- sum(Samp[i])
+       Samp[i] <- round((Samp[i]/sum(Samp[i]))*100, digits = 7)
+       Samp_data <- Sample_Row(i)
+       statistics <- Samp %>% summarise(num_sp = n(),
+                                        max = max(Samp[i]))
+  
+       ### Filter collection selection
+       Filt_Path <- paste0(getwd(),"/03-Quality_Control/Filter_Parameters/",chain,"/")
+       if (!is.null(opt$filtDate)) {
+         F_Date <- opt$filtDate
+       } else {
+         F_Date <- list.files(path = Filt_Path,
+                    pattern = as.character(Samp_data$tipo_muestra), all.files = FALSE,
+                    full.names = FALSE, recursive = FALSE,
+                    ignore.case = FALSE, include.dirs = FALSE, no.. = TRUE)
+         F_Date <- gsub("^.*?_","",F_Date[length(F_Date)])
+       }
+       cat(blue("Control files used in "%+%chain%+%" are on date: "%+%green$bold(F_Date)%+%"\n"))
+       ### Contamination check
+       TOP_10 <- Samp %>% 
+         arrange_(.dots = paste0("desc(",i,")")) %>% 
+         slice(1:10)
+       ### Si aparece algun MO contaminate ponerlo
+       #Bac_control <- TOP_10 %>%
+       #  filter(grepl("Nitrososphaera",Species))   ## <- Add contamination Sp
+       #Control <- ifelse(nrow(Bac_control) > 0 ,
+       #                  ifelse(sum(Bac_control[1]) > 5,
+       #                         "High",
+       #                         "Low"),
+       #                  "Low")
+       Control <- "Low"
+       ### Limits files
+       Limits <- read.csv(paste0(Filt_Path,Samp_data$tipo_muestra,"_",F_Date,"/limit_Species_",chain,"_",Samp_data$tipo_muestra,".csv"))
+       Limits <- Limits %>%
+         select(genus_specie, avg_PER, sd) %>%
+         `colnames<-`(c("Species", "avg_PER", "sd"))
+       Num_SP_control <- Limits %>% summarise(num_sp = n())
+       mean <- read.csv(paste0(Filt_Path,Samp_data$tipo_muestra,"_",F_Date,"/number_Species_",chain,"_",Samp_data$tipo_muestra,".csv"))
+       MAX <- read.csv(paste0(Filt_Path,Samp_data$tipo_muestra,"_",F_Date,"/max_Species_",chain,"_",Samp_data$tipo_muestra,".csv"))
+       ### Species number analysis
+       SpeciesNUM <- ifelse(statistics[,1] < (mean[2]-mean[3]), 
+                            "Low", 
+                            "GOOD")
+       ### Abundance specie analysis
+       SPMAX <- Samp %>%
+         filter_(.dots = paste0(i,"==",statistics[,2]))
        
-       Genero_sp <- Genero_sp %>% 
-         mutate(Norm_limit = (avg_PER + 1.5*sd)*100,
-                Alert_limit = (avg_PER + 2.5*sd)*100)
+       SpeciesMAX <- ifelse(grepl(" sp",SPMAX[1,2]),
+                            ifelse(statistics[,2] > ((MAX[2]+(2*MAX[3]))*100), #<- cambiar para diferentes sd con sp. 
+                                   "ALERT", 
+                                   "GOOD"),
+                            ifelse(statistics[,2] > (MAX[2]+MAX[3]*100), 
+                                   "ALERT", 
+                                   "GOOD"))
+       ### Analisis especies control
+       limit_x <- Num_SP_control[,1]*10/100 #limite en eje para muy graves
+       limit_y <- Num_SP_control[,1]*20/100 #limite en eje para normales
        
-       ### Filtro para especies
-       Specie_sp <- comparaTION %>%
-         filter(!grepl(" sp", Species))
+       Area_control <- ((limit_x*limit_y) - limit_x^2)
        
-       Specie_sp <- Specie_sp %>% 
-         mutate(Norm_limit = (avg_PER + sd)*100,
-                Alert_limit = (avg_PER + 2*sd)*100)
-       
-       comparaTION <- merge(Specie_sp, Genero_sp, all = TRUE)
-       
-       comparaTION$reason <- ifelse(comparaTION[i] > comparaTION$Norm_limit, 
-                                    ifelse(comparaTION[i] > comparaTION$Alert_limit, 
-                                           "Great_problem", 
-                                           "Normal_problem"),
-                                    "No_problem")
-       
-       Problems <- comparaTION %>%
-         group_by(reason) %>%
+       ### Analisis con especies control de muestra
+       comparaTION <- merge(Samp, Limits)
+       Num_SP_CM <- comparaTION %>%
          summarise(number = n())
        
-       GP <- Problems %>%
-         filter(reason == "Great_problem") %>%
-         summarise(n = sum(number))
+       if (Num_SP_CM[,1] < (Num_SP_control[,1]/2)) {
+         Samp_data$tipo_muestra <- paste0("Isn't ",Samp_data$tipo_muestra)
+         ControlSpecies <- "Have less than 50% of Sp"
+         Diagnostic <- "REVIEW"
+       }else {
+         ### Filtro para Genero sp.
+         Genero_sp <- comparaTION %>%
+           filter(grepl(" sp", Species))
+         
+         Genero_sp <- Genero_sp %>% 
+           mutate(Norm_limit = (avg_PER + 1.5*sd)*100,
+                  Alert_limit = (avg_PER + 2.5*sd)*100)
+         
+         ### Filtro para especies
+         Specie_sp <- comparaTION %>%
+           filter(!grepl(" sp", Species))
+         
+         Specie_sp <- Specie_sp %>% 
+           mutate(Norm_limit = (avg_PER + sd)*100,
+                  Alert_limit = (avg_PER + 2*sd)*100)
+         
+         comparaTION <- merge(Specie_sp, Genero_sp, all = TRUE)
+         
+         comparaTION$reason <- ifelse(comparaTION[i] > comparaTION$Norm_limit, 
+                                      ifelse(comparaTION[i] > comparaTION$Alert_limit, 
+                                             "Great_problem", 
+                                             "Normal_problem"),
+                                      "No_problem")
+         
+         Problems <- comparaTION %>%
+           group_by(reason) %>%
+           summarise(number = n())
+         
+         GP <- Problems %>%
+           filter(reason == "Great_problem") %>%
+           summarise(n = sum(number))
+         
+         NP <- Problems %>%
+           filter(reason == "Normal_problem") %>%
+           summarise(n = sum(number))
+         
+         Area_problema <- (((-2*GP[,1]-NP[,1])/-2) * (NP[,1]-(-2*GP[,1])))-(((-2*GP[,1]-NP[,1])/-2)^2)
+         
+         ControlSpecies <- ifelse(Area_control < Area_problema[,1], 
+                                  "ALERT", 
+                                  "GOOD")
+         
+         ### hay que cambiarlo por todo el proceso de control de integrales y rectas
+         Diagnostic <- ifelse(SpeciesMAX  == "GOOD", 
+                              ifelse(ControlSpecies == "GOOD", 
+                                     ifelse(SpeciesNUM == "GOOD", 
+                                            "GOOD", 
+                                            "REVIEW"),
+                                     "REVIEW"),
+                              "REVIEW")
+       }
        
-       NP <- Problems %>%
-         filter(reason == "Normal_problem") %>%
-         summarise(n = sum(number))
-       
-       Area_problema <- (((-2*GP[,1]-NP[,1])/-2) * (NP[,1]-(-2*GP[,1])))-(((-2*GP[,1]-NP[,1])/-2)^2)
-       
-       ControlSpecies <- ifelse(Area_control < Area_problema[,1], 
-                                "ALERT", 
-                                "GOOD")
-       
-       ### hay que cambiarlo por todo el proceso de control de integrales y rectas
-       Diagnostic <- ifelse(SpeciesMAX  == "GOOD", 
-                            ifelse(ControlSpecies == "GOOD", 
-                                   ifelse(SpeciesNUM == "GOOD", 
-                                          "GOOD", 
-                                          "REVIEW"),
-                                   "REVIEW"),
-                            "REVIEW")
+       TXT <- TEXTO_Soil_Grape(i, Samp_data, chain, opt$date, Reads_Finales, Control, Samp, TOP_10, SpeciesNUM, SpeciesMAX, ControlSpecies, Diagnostic)
+       Bac_Soil_Grape <- rbind(Bac_Soil_Grape,TXT)
      }
-     
-     TXT <- TEXTO_Soil_Grape(i, Samp_data, chain, opt$date, Reads_Finales, Control, Samp, TOP_10, SpeciesNUM, SpeciesMAX, ControlSpecies, Diagnostic)
-     Bac_Soil_Grape <- rbind(Bac_Soil_Grape,TXT)
+     dir.create(paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Soil_Grape/",chain,"/Informs/"), showWarnings = FALSE, recursive = TRUE)
+     write.table(Bac_Soil_Grape, file = paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Soil_Grape/",chain,"/Informs/Good_SoilGrape_",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
    }
-   dir.create(paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Soil_Grape/",chain,"/Informs/"), showWarnings = FALSE, recursive = TRUE)
-   write.table(Bac_Soil_Grape, file = paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Soil_Grape/",chain,"/Informs/Good_SoilGrape_",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
- }
- cat(blue("Finished analysis of "%+%green$bold(chain)%+%"\n"))
+   cat(blue("Finished analysis of "%+%green$bold(chain)%+%"\n"))
+  } else {
+    cat(red$bold(paste0("\n Dont have files to analyze ",chain,"\n")))
+  }
 }
 
 cat(magenta$bold("O       o O       o O       o          O       o O       o O       o\n"))
