@@ -61,7 +61,7 @@ for (chain in c("16S","ITS")) {
 
  ##### FILE LOAD
  ### Runs del projecto
-#  if (file.exists(paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_Reads_Raw.csv")) == TRUE ) {
+  if (file.exists(paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_Abundance.csv")) == TRUE ) {
    File <- read.csv(paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_Reads_Raw.csv"))
    File$Sample <- gsub("\\-",".",File$Sample)
    File$ws_sample_name <- substring(File$Sample, 1, 6)
@@ -99,8 +99,9 @@ for (chain in c("16S","ITS")) {
    write.table(BadReadstxt, file = paste0(opt$Path,opt$date,"/Bad_Reads/",chain,"/Informs/Bad_Reads_",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
    cat(blue("Finished analysis of "%+%green$bold(chain)%+%"\n"))
    dbDisconnect(local_DB)
- # } else {
- #   cat(red$boild(paste0("\n Dont have files needeed to analyze ",chain,"\n")))
+  } else {
+    cat(red$bold(paste0("\n Dont have files needeed to analyze ",chain,"\n")))
+  }
 } 
 
 cat(magenta$bold("O       o O       o O       o          O       o O       o O       o\n"))
