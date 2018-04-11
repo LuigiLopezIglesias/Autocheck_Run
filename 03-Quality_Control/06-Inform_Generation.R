@@ -41,7 +41,9 @@ for (chain in c("16S","ITS")) {
      ifelse(SG_size < 5,
             SOIL_GRAPE_GOOD <- data.frame(),
             SOIL_GRAPE_GOOD <- read.csv(paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Soil_Grape/",chain,"/Informs/Good_SoilGrape_",opt$date,"_",chain,".csv")))
-     
+     if (FERM_size < 5 && LOW_size < 5 && BMK_size < 5 && SG_size < 5) {
+       cat(red$bold("Don't have information to make inform file\n"))
+     } else {	 
      ANITA_INFO <- rbindlist(list(SOIL_GRAPE_GOOD, BMK_GOOD, FERMENTED_GOOD, LOW_READS), fill = TRUE) 
      ANITA_INFO[ANITA_INFO == "NoA"] <- NA
      dir.create(paste0(opt$Path,opt$date,"/RUN_Inform/",chain,"/"), showWarnings = FALSE, recursive = TRUE)
@@ -55,6 +57,7 @@ for (chain in c("16S","ITS")) {
      write.table(ANIITA_INFO, file = paste0(opt$Path,opt$date,"/RUN_Inform/",chain,"/Inform_",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
      write.xlsx(x = ANIITA_INFO, file = paste0(opt$Path,opt$date,"/RUN_Inform/",chain,"/Inform_",opt$date,"_",chain,".xlsx"), row.names = FALSE)
      cat(blue("Finished analysis of "%+%green$bold(chain)%+%"\n"))
+   }
    } else {
     cat(red$bold(paste0("\n Dont have the files needed to analyze ",chain,"\n")))
    }
