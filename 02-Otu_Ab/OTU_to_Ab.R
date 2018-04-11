@@ -26,71 +26,73 @@ cat(blue("The path where input file and output file an folder is: "%+%green$bold
 
 for (chain in c("16S","ITS")) {
 	# Loading OTUs File
-	ifelse(file.exists(paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_mapped_reads_tax.biom")),
-	dat <- read_biom(paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_mapped_reads_tax.biom")),
-	next)
-	otu_table <- as.data.frame(as.matrix(biom_data(dat)))
-	otu_table$OTU.ID <- rownames(otu_table)
-	
-	MetaDat <- observation_metadata(dat)
-	MetaDat$OTU.ID <- rownames(MetaDat)
-	
-	BiomFile <- merge(otu_table, MetaDat, by = "OTU.ID") 
-	
-	CleanBiomFile <- BiomFile %>%
-	  filter(confidence > opt$confVal)
-	
-	SamplesFile <- CleanBiomFile %>%
-	  select(-OTU.ID, -confidence, -taxonomy1, -taxonomy2, -taxonomy3,- taxonomy4, -taxonomy5, -taxonomy6)
-	
-	## Selection Species taxa
-	SamplesFile$Species <-  gsub('.*s:','',SamplesFile$taxonomy7)
-	
-	## summarise reads of same Specie but different otus
-	AbundanceFile <- SamplesFile %>%
-	  select(-taxonomy7) %>%
-	  group_by(Species) %>%
-	  summarise_all(funs(sum))
-	
-	## Write abundance file to Anita
-	write.table(AbundanceFile, file = paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_Abundance.csv"), 
-	            col.names = TRUE, row.names = FALSE, sep = ",")
-	
-	## Individual Abundance by sample
-	colnames(AbundanceFile) <- gsub('-','.',colnames(AbundanceFile))
-	
-	dir.create(paste0(opt$Path,opt$date,"/",chain,"_Individuales/"), showWarnings = FALSE, recursive = TRUE)
-	
-	for(i in colnames(AbundanceFile[-1])){
-	  Samp <- AbundanceFile %>%
-	    select_(.dots = "Species",i) %>%
-	    filter_(.dots = paste0(i, " > 0")) %>%
-	    arrange_(.dots = paste0("desc(",i,")")) 
-	    #arrange(Species)
-	  Samp[2] <- Samp[2] * 100/colSums(Samp[2])
-	  colnames(Samp) <- gsub('\\.','-',colnames(Samp))
-	  #print(colnames(Samp[2]))
-	  #write.table(Samp, file = paste0(opt$Path,opt$date,"/",chain,"_Individuales/",colnames(Samp[2]),"_",chain,".csv"), 
-	  #            col.names = TRUE, row.names = FALSE, sep = ",")
-	  write.xlsx(x = as.data.frame(Samp), file = paste0(opt$Path,opt$date,"/",chain,"_Individuales/",colnames(Samp[2]),"_",chain,".xlsx"), 
-	             row.names = FALSE)
-	}
-	OTUSamplesFile <- CleanBiomFile %>% 
-		select( -confidence)
+	if (file.exists(paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_mapped_reads_tax.biom"))==TRUE){ 
+	  dat <- read_biom(paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_mapped_reads_tax.biom"))
+	  otu_table <- as.data.frame(as.matrix(biom_data(dat)))
+	  otu_table$OTU.ID <- rownames(otu_table)
+	  
+	  MetaDat <- observation_metadata(dat)
+	  MetaDat$OTU.ID <- rownames(MetaDat)
+	  
+	  BiomFile <- merge(otu_table, MetaDat, by = "OTU.ID") 
+	  
+	  CleanBiomFile <- BiomFile %>%
+	    filter(confidence > opt$confVal)
+	  
+	  SamplesFile <- CleanBiomFile %>%
+	    select(-OTU.ID, -confidence, -taxonomy1, -taxonomy2, -taxonomy3,- taxonomy4, -taxonomy5, -taxonomy6)
+	  
+	  ## Selection Species taxa
+	  SamplesFile$Species <-  gsub('.*s:','',SamplesFile$taxonomy7)
+	  
+	  ## summarise reads of same Specie but different otus
+	  AbundanceFile <- SamplesFile %>%
+	    select(-taxonomy7) %>%
+	    group_by(Species) %>%
+	    summarise_all(funs(sum))
+	  
+	  ## Write abundance file to Anita
+	  write.table(AbundanceFile, file = paste0(opt$Path,opt$date,"/",chain,"_",opt$date,"_Abundance.csv"), 
+	              col.names = TRUE, row.names = FALSE, sep = ",")
+	  
+	  ## Individual Abundance by sample
+	  colnames(AbundanceFile) <- gsub('-','.',colnames(AbundanceFile))
+	  
+	  dir.create(paste0(opt$Path,opt$date,"/",chain,"_Individuales/"), showWarnings = FALSE, recursive = TRUE)
+	  
+	  for(i in colnames(AbundanceFile[-1])){
+	    Samp <- AbundanceFile %>%
+	      select_(.dots = "Species",i) %>%
+	      filter_(.dots = paste0(i, " > 0")) %>%
+	      arrange_(.dots = paste0("desc(",i,")")) 
+	      #arrange(Species)
+	    Samp[2] <- Samp[2] * 100/colSums(Samp[2])
+	    colnames(Samp) <- gsub('\\.','-',colnames(Samp))
+	    #print(colnames(Samp[2]))
+	    #write.table(Samp, file = paste0(opt$Path,opt$date,"/",chain,"_Individuales/",colnames(Samp[2]),"_",chain,".csv"), 
+	    #            col.names = TRUE, row.names = FALSE, sep = ",")
+	    write.xlsx(x = as.data.frame(Samp), file = paste0(opt$Path,opt$date,"/",chain,"_Individuales/",colnames(Samp[2]),"_",chain,".xlsx"), 
+	               row.names = FALSE)
+	  }
+	  OTUSamplesFile <- CleanBiomFile %>% 
+	  	select( -confidence)
 
-	colnames(OTUSamplesFile) <- gsub("\\-",".",colnames(OTUSamplesFile))
-        cat(yellow("creating abundances of "%+%green$bold(chain)%+%" samples of "%+%green$bold(opt$date)%+%" Run\n"))
-	#OTUs Abundance by sample
-	dir.create(paste0(opt$Path,opt$date,"/",chain,"_OTUs_Ab/"), showWarnings = FALSE, recursive = TRUE)
+	  colnames(OTUSamplesFile) <- gsub("\\-",".",colnames(OTUSamplesFile))
+          cat(yellow("creating abundances of "%+%green$bold(chain)%+%" samples of "%+%green$bold(opt$date)%+%" Run\n"))
+	  #OTUs Abundance by sample
+	  dir.create(paste0(opt$Path,opt$date,"/",chain,"_OTUs_Ab/"), showWarnings = FALSE, recursive = TRUE)
 
-	for(OTUSamp in colnames(OTUSamplesFile[2:(length(colnames(OTUSamplesFile))-7)])){
-	  #print(OTUSamp)
-          Samp <- OTUSamplesFile %>%
-            select_(.dots = "OTU.ID","taxonomy1","taxonomy2","taxonomy3","taxonomy4","taxonomy5","taxonomy6","taxonomy7",OTUSamp) %>%
-          filter_(.dots = paste0(OTUSamp, " > 0")) %>% 
-            arrange(taxonomy7)
-          Samp[9] <- Samp[9] * 100/colSums(Samp[9])
-          write.xlsx(x = as.data.frame(Samp), file = paste0(opt$Path,opt$date,"/",chain,"_OTUs_Ab/",OTUSamp,"_",chain,".xlsx"), row.names = FALSE)
+	  for(OTUSamp in colnames(OTUSamplesFile[2:(length(colnames(OTUSamplesFile))-7)])){
+	    #print(OTUSamp)
+            Samp <- OTUSamplesFile %>%
+              select_(.dots = "OTU.ID","taxonomy1","taxonomy2","taxonomy3","taxonomy4","taxonomy5","taxonomy6","taxonomy7",OTUSamp) %>%
+            filter_(.dots = paste0(OTUSamp, " > 0")) %>% 
+              arrange(taxonomy7)
+            Samp[9] <- Samp[9] * 100/colSums(Samp[9])
+            write.xlsx(x = as.data.frame(Samp), file = paste0(opt$Path,opt$date,"/",chain,"_OTUs_Ab/",OTUSamp,"_",chain,".xlsx"), row.names = FALSE)
+	  }
+	} else {
+	cat(red$bold(paste0("\n Dont have files needed to analyze ",chain,"\n")))
 	}
 }
 
