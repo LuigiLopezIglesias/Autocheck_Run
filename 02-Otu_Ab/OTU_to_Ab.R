@@ -57,10 +57,10 @@ for (chain in c("16S","ITS")) {
 	  
 	  ## Individual Abundance by sample
 	  colnames(AbundanceFile) <- gsub('-','.',colnames(AbundanceFile))
-	  
 	  dir.create(paste0(opt$Path,opt$date,"/",chain,"_Individuales/"), showWarnings = FALSE, recursive = TRUE)
 	  
 	  for(i in colnames(AbundanceFile[-1])){
+	    i <- paste0("`",i,"`")
 	    Samp <- AbundanceFile %>%
 	      select_(.dots = "Species",i) %>%
 	      filter_(.dots = paste0(i, " > 0")) %>%
@@ -83,10 +83,10 @@ for (chain in c("16S","ITS")) {
 	  dir.create(paste0(opt$Path,opt$date,"/",chain,"_OTUs_Ab/"), showWarnings = FALSE, recursive = TRUE)
 
 	  for(OTUSamp in colnames(OTUSamplesFile[2:(length(colnames(OTUSamplesFile))-7)])){
-	    #print(OTUSamp)
+	    OTUSampi <- paste0("`",OTUSamp,"`")
             Samp <- OTUSamplesFile %>%
-              select_(.dots = "OTU.ID","taxonomy1","taxonomy2","taxonomy3","taxonomy4","taxonomy5","taxonomy6","taxonomy7",OTUSamp) %>%
-            filter_(.dots = paste0(OTUSamp, " > 0")) %>% 
+              select_(.dots = "OTU.ID","taxonomy1","taxonomy2","taxonomy3","taxonomy4","taxonomy5","taxonomy6","taxonomy7",OTUSampi) %>%
+              filter_(.dots = paste0(OTUSampi, " > 0")) %>% 
               arrange(taxonomy7)
             Samp[9] <- Samp[9] * 100/colSums(Samp[9])
             write.xlsx(x = as.data.frame(Samp), file = paste0(opt$Path,opt$date,"/",chain,"_OTUs_Ab/",OTUSamp,"_",chain,".xlsx"), row.names = FALSE)
