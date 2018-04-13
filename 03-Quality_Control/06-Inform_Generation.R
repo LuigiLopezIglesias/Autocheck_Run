@@ -52,7 +52,7 @@ for (chain in c("16S","ITS")) {
      ANIITA_INFO <- read.csv(paste0(opt$Path,opt$date,"/RUN_Inform/",chain,"/Inform_",opt$date,"_",chain,".csv"))
      ANIITA_INFO <- ANIITA_INFO %>%
        arrange(Sample) %>%
-       select(Sample, Chain_Type, Project, Sample_type, Stage, Substage, Initial_read, Final_reads, Contamination_sp, Sp_Num, Species, Sp_Max_perc,  Control_Num_Sp, Control_Max_Sp, Control_Samp_Type_SP, Diagnostic)
+       select(Sample, Chain_Type, Project, Sample_type, Stage, Substage, Initial_reads, Final_reads, Contamination_sp, Sp_Num, Species, Sp_Max_perc,  Control_Num_Sp, Control_Max_Sp, Control_Samp_Type_SP, Diagnostic)
      
      write.table(ANIITA_INFO, file = paste0(opt$Path,opt$date,"/RUN_Inform/",chain,"/Inform_",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
      write.xlsx(x = ANIITA_INFO, file = paste0(opt$Path,opt$date,"/RUN_Inform/",chain,"/Inform_",opt$date,"_",chain,".xlsx"), row.names = FALSE)
