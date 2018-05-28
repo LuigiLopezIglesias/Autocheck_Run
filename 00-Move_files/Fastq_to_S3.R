@@ -35,6 +35,10 @@ TXTFiles <- paste0("aws s3 mv ",PATH,"/FastqSummaryF1L1.txt ",Folder)
 XMLFiles <- paste0("aws s3 mv ",PATH,"/config.xml ",Folder)
   system(XMLFiles, inter = TRUE)
 
+RunParameter <- paste0("aws s3 mv ",PATH,"/runParameters.xml ",Folder)
+
+SampSheet <- paste0("aws s3 mv ",PATH,"/SampleSheet.csv ",Folder)
+
 ### Seleccion de nombre de muestra
 cat(silver("\n Making Sample name \n"))
 mysamps <- vector()
