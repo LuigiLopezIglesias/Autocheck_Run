@@ -64,12 +64,18 @@ Reads_16S <- Reads_file %>%
   filter(grepl("b", Sample))
 #print(Reads_16S)
 
+Reads_18S <- Reads_file %>%
+  filter(grepl("c", Sample))
+#print(Reads_18S)
+
 Reads_ITS <- Reads_file %>%
-  filter(!grepl("b", Sample))
+  filter(!grepl("b|c", Sample))
 #print(Reads_ITS)
+
 dir.create(paste0(opt$Path,opt$date,"/"), showWarnings = FALSE, recursive = TRUE)
 write.table(Reads_ITS, file = paste0(opt$Path,opt$date,"/ITS_",opt$date,"_Reads_Raw.csv"), sep=",",row.names = FALSE, quote = FALSE)
 write.table(Reads_16S, file = paste0(opt$Path,opt$date,"/16S_",opt$date,"_Reads_Raw.csv"), sep=",",row.names = FALSE, quote = FALSE)
+write.table(Reads_18S, file = paste0(opt$Path,opt$date,"/18S_",opt$date,"_Reads_Raw.csv"), sep=",",row.names = FALSE, quote = FALSE)
 
 cat(red$bold("O       o O       o O       o          O       o O       o O       o\n"))
 cat(red$bold("| O   o | | O   o | | O   o |   STEP   | O   o | | O   o | | O   o |\n"))
