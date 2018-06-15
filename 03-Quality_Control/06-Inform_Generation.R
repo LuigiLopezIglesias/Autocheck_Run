@@ -43,17 +43,22 @@ for (chain in c("16S","ITS")) {
             SOIL_GRAPE_GOOD <- read.csv(paste0(opt$Path,opt$date,"/Wineseq/Good_Reads/Soil_Grape/",chain,"/Informs/Good_SoilGrape_",opt$date,"_",chain,".csv")))
      if (FERM_size < 5 && LOW_size < 5 && BMK_size < 5 && SG_size < 5) {
        cat(red$bold("Don't have information to make inform file\n"))
-     } else {	 
-     ANITA_INFO <- rbindlist(list(SOIL_GRAPE_GOOD, BMK_GOOD, FERMENTED_GOOD, LOW_READS), fill = TRUE) 
-     ANITA_INFO[ANITA_INFO == "NoA"] <- NA
-     dir.create(paste0(opt$Path,opt$date,"/RUN_Inform/",chain,"/"), showWarnings = FALSE, recursive = TRUE)
-     write.table(ANITA_INFO, file = paste0(opt$Path,opt$date,"/RUN_Inform/",chain,"/Inform_",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
-     
-     ANIITA_INFO <- read.csv(paste0(opt$Path,opt$date,"/RUN_Inform/",chain,"/Inform_",opt$date,"_",chain,".csv"))
-     ANIITA_INFO <- ANIITA_INFO %>%
-       arrange(Sample) %>%
-       select(Sample, Chain_Type, Project, Sample_type, Stage, Substage, Initial_reads, Final_reads, Contamination_sp, Sp_Num, Species, Sp_Max_perc,  Control_Num_Sp, Control_Max_Sp, Control_Samp_Type_SP, Diagnostic)
-     
+     } else {
+       ANITA_INFO <- rbindlist(list(SOIL_GRAPE_GOOD, BMK_GOOD, FERMENTED_GOOD, LOW_READS), fill = TRUE)
+         ANITA_INFO[ANITA_INFO == "NoA"] <- NA
+         dir.create(paste0(opt$Path,opt$date,"/RUN_Inform/",chain,"/"), showWarnings = FALSE, recursive = TRUE)
+         write.table(ANITA_INFO, file = paste0(opt$Path,opt$date,"/RUN_Inform/",chain,"/Inform_",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
+
+         ANIITA_INFO <- read.csv(paste0(opt$Path,opt$date,"/RUN_Inform/",chain,"/Inform_",opt$date,"_",chain,".csv"))	
+       if (FERM_size < 5) {
+         ANIITA_INFO <- ANIITA_INFO %>%
+           arrange(Sample) %>%
+           select(Sample, Chain_Type, Project, Sample_type, Initial_reads, Final_reads, Contamination_sp, Sp_Num, Species, Sp_Max_perc,  Control_Num_Sp, Control_Max_Sp, Control_Samp_Type_SP, Diagnostic)
+       } else { 
+         ANIITA_INFO <- ANIITA_INFO %>%
+           arrange(Sample) %>%
+           select(Sample, Chain_Type, Project, Sample_type, Stage, Substage, Initial_reads, Final_reads, Contamination_sp, Sp_Num, Species, Sp_Max_perc,  Control_Num_Sp, Control_Max_Sp, Control_Samp_Type_SP, Diagnostic)
+       }
      write.table(ANIITA_INFO, file = paste0(opt$Path,opt$date,"/RUN_Inform/",chain,"/Inform_",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
      write.xlsx(x = ANIITA_INFO, file = paste0(opt$Path,opt$date,"/RUN_Inform/",chain,"/Inform_",opt$date,"_",chain,".xlsx"), row.names = FALSE)
      cat(blue("Finished analysis of "%+%green$bold(chain)%+%"\n"))
