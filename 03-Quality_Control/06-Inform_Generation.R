@@ -3,7 +3,9 @@ library(data.table)
 library(dplyr)
 require(xlsx)
 library(crayon)
-
+library(RPostgreSQL)
+#########################################################################################
+###     Cargar argumentos//Load arguments      ###
 #########################################################################################
 ###     Cargar argumentos//Load arguments      ###
 option_list <- list(
@@ -11,7 +13,17 @@ option_list <- list(
               dest='date', type='character'),
   make_option(c('-p', '--path'), action='store',
               dest='Path', type='character',
-              default="/home/yamishakka/Escritorio/Biomemakers/00-NP_Abundances/")
+              default="/home/yamishakka/Escritorio/Biomemakers/00-NP_Abundances/"),
+  make_option(c('-U', '--user'), action='store',
+              dest='user', type='character'),
+  make_option(c('-P', '--password'), action='store',
+              dest='password', type='character'),
+  make_option(c('-H', '--host'), action='store',
+              dest='host', type='character'),
+  make_option(c('-g','--port'), action='store',
+              dest='port', type='integer'),
+  make_option(c('-n','--dbname'), action='store',
+              dest='dbname', type='character')
 )
 ### Load arguments
 opt <- parse_args(OptionParser(option_list=option_list))
@@ -59,8 +71,26 @@ for (chain in c("16S","ITS")) {
            arrange(Sample) %>%
            select(Sample, Chain_Type, Project, Sample_type, Stage, Substage, Initial_reads, Final_reads, Contamination_sp, Sp_Num, Species, Sp_Max_perc,  Control_Num_Sp, Control_Max_Sp, Control_Samp_Type_SP, Diagnostic)
        }
-     write.table(ANIITA_INFO, file = paste0(opt$Path,opt$date,"/RUN_Inform/",chain,"/Inform_",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
-     write.xlsx(x = ANIITA_INFO, file = paste0(opt$Path,opt$date,"/RUN_Inform/",chain,"/Inform_",opt$date,"_",chain,".xlsx"), row.names = FALSE)
+     #########################################################################################
+     ### Conexion con la base de datos
+     drv <- dbDriver("PostgreSQL")
+     local_DB <- dbConnect(drv, user=opt$user,
+                          password=opt$password,
+                          host=opt$host,
+                          port=opt$port, dbname=opt$dbname)
+
+     Repetitions <- paste0("select m.c_muestra_wineseq, repeat_dna_extraction, repeat_pcr_16s, repeat_pcr_its
+from muestra m
+join muestra_internal mi on m.id = mi.id_muestra")
+     Rep_set <- dbGetQuery(local_DB, Repetitions)
+     colnames(Rep_set) <- c("Sample", "DNA_rep", "16S_PCR_Rep", "ITS_PCR_Rep")
+     if (chain == "16S") {
+       Rep_set$Sample <- paste0(Rep_set$Sample,"b")
+     }
+     Report <- merge(ANIITA_INFO, Rep_set)
+    
+     write.table(Report, file = paste0(opt$Path,opt$date,"/RUN_Inform/",chain,"/Inform_",opt$date,"_",chain,".csv"), col.names = TRUE, row.names = FALSE, sep = ",")
+     write.xlsx(x = Report, file = paste0(opt$Path,opt$date,"/RUN_Inform/",chain,"/Inform_",opt$date,"_",chain,".xlsx"), row.names = FALSE)
      cat(blue("Finished analysis of "%+%green$bold(chain)%+%"\n"))
    }
    } else {

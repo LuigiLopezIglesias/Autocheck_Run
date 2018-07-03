@@ -53,25 +53,29 @@ for (chain in c("16S","ITS")) {
    File$ws_sample_name <- gsub('b.*', '', File$ws_sample_name) 
    
    #### ANALYSIS
-   WS_Samps <- paste0("select muestra.c_muestra_wineseq, tipo_muestra.d_tipo_muestra from muestra, tipo_muestra
-                      where muestra.c_tipo_muestra = tipo_muestra.c_tipo_muestra
-                      and (tipo_muestra.d_tipo_muestra = 'Soil'
-                      or tipo_muestra.d_tipo_muestra = 'Grape'
-                      or tipo_muestra.d_tipo_muestra = 'Fermented')
-                      order by c_muestra_wineseq")
+   WS_Samps <- paste0("select m.c_muestra_wineseq, tm.d_tipo_muestra, mi.repeat_dna_extraction, mi.repeat_pcr_16s, mi.repeat_pcr_its
+			from muestra m
+			join tipo_muestra tm on tm.c_tipo_muestra = m.c_tipo_muestra
+			join muestra_internal mi on m.id = mi.id_muestra
+                        where (tm.d_tipo_muestra = 'Soil'
+                               or tm.d_tipo_muestra = 'Grape'
+                               or tm.d_tipo_muestra = 'Fermented')
+                        order by c_muestra_wineseq")
    
    WineSeq <- dbGetQuery(local_DB, WS_Samps)
-   colnames(WineSeq) <- c("ws_sample_name", "tipo_muestra")
+   colnames(WineSeq) <- c("ws_sample_name", "tipo_muestra", "extraction_DNA", "16S_PCR_Rep", "ITS_PCR_Rep")
    
-   NWS_Samps <- paste0("select muestra.c_muestra_wineseq, tipo_muestra.d_tipo_muestra from muestra, tipo_muestra
-                       where muestra.c_tipo_muestra = tipo_muestra.c_tipo_muestra
-                       and (tipo_muestra.d_tipo_muestra != 'Soil'
-                       and tipo_muestra.d_tipo_muestra != 'Grape'
-                       and tipo_muestra.d_tipo_muestra != 'Fermented')
-                       order by c_muestra_wineseq")
+   NWS_Samps <- paste0("select m.c_muestra_wineseq, tm.d_tipo_muestra, mi.repeat_dna_extraction, mi.repeat_pcr_16s, mi.repeat_pcr_its
+			 from muestra m
+			 join tipo_muestra tm on tm.c_tipo_muestra = m.c_tipo_muestra
+                         join muestra_internal mi on m.id = mi.id_muestra
+                         and (tm.d_tipo_muestra != 'Soil'
+                              and tm.d_tipo_muestra != 'Grape'
+                              and tm.d_tipo_muestra != 'Fermented')
+                         order by c_muestra_wineseq")
    
    NoWineSeq <- dbGetQuery(local_DB, NWS_Samps)
-   colnames(NoWineSeq) <- c("ws_sample_name", "tipo_muestra")
+   colnames(NoWineSeq) <- c("ws_sample_name", "tipo_muestra", "extraction_DNA", "16S_PCR_Rep", "ITS_PCR_Rep")
    
    ### Separacion muestras WS y NWS
    WS <- merge(File, WineSeq)

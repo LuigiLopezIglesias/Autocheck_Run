@@ -23,4 +23,4 @@ Rscript ./03-Quality_Control/04-Soil_Grape_Filter.R $DATE $QDate $PATHx
 
 Rscript ./03-Quality_Control/05-Bad_Reads_Inform.R $DATE -U $DB_USER -P $DB_PASSWORD -H $DB_HOST -g $DB_PORT -n $DB_NAME $PATHx
 
-Rscript ./03-Quality_Control/06-Inform_Generation.R $DATE $PATHx
+Rscript ./03-Quality_Control/06-Inform_Generation.R $DATE -U $DB_USER -P $DB_PASSWORD -H $DB_HOST -g $DB_PORT -n $DB_NAME $PATHx 
