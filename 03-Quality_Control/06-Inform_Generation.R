@@ -4,6 +4,7 @@ library(dplyr)
 require(xlsx)
 library(crayon)
 library(RPostgreSQL)
+library(stringr)
 #########################################################################################
 ###     Cargar argumentos//Load arguments      ###
 #########################################################################################
@@ -80,8 +81,8 @@ for (chain in c("16S","ITS")) {
                           port=opt$port, dbname=opt$dbname)
 
      Repetitions <- paste0("select m.c_muestra_wineseq, repeat_dna_extraction, repeat_pcr_16s, repeat_pcr_its
-from muestra m
-join muestra_internal mi on m.id = mi.id_muestra")
+                            from muestra m
+                            join muestra_internal mi on m.id = mi.id_muestra")
      Rep_set <- dbGetQuery(local_DB, Repetitions)
      colnames(Rep_set) <- c("Sample", "DNA_rep", "16S_PCR_Rep", "ITS_PCR_Rep")
      if (chain == "16S") {
