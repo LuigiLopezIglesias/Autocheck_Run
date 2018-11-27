@@ -1,4 +1,5 @@
 PyScripts/__init__.pyc
 PyScripts/GeneralTools.pyc
 PyScripts/ExcelGeneration.pyc
-PyScripts/ReadsAnalysis.py
+PyScripts/Query.pyc
+PyScripts/ReadsAnalysis.pyc
