@@ -39,7 +39,6 @@ def readsCount(Project, marker, FastqPath, ResultPath):
   goodCV.finalReads = goodCV.finalReads.astype(int)
   goodCV.percReadsLost = goodCV.percReadsLost.astype(float)
   goodCV['percReadsLost'] = goodCV['percReadsLost'].round(4)
-  #goodCV[['sample', 'initialReads', 'finalReads', 'percReadsLost', 'date']].to_csv(ResultPath+'/'+Project+'/'+marker+'_'+Project+'_Reads_Raw.csv', index=False, decimal=',')
   return goodCV
 
 def samplesMetrics(Project, marker, ResultPath):
@@ -60,6 +59,7 @@ def samplesMetrics(Project, marker, ResultPath):
       "MaxSpReads": principalSpReads,
       "SpNumber": SampSpNumber
     })
+  goodCV.groupby(['Species']).sum().to_csv(ResultPath+'/'+Project+'/'+marker.upper()+'_'+Project+'_Abundance.csv', index=False, decimal=',')
   return pd.DataFrame(Metrics)
 
 def samplesDBInfo(Project, marker, ResultPath):
@@ -68,7 +68,7 @@ def samplesDBInfo(Project, marker, ResultPath):
   ReadsInfo['DBnames'] = ReadsInfo['DBnames'].str.split('-').str.get(0)
   myString = "','".join(ReadsInfo['DBnames'])
   metadata = Q.DBMetadataQuery(myString)
-  metadata.columns = ['DBnames', 'sampleType', 'repeatDNAExtraction', 'repeatPCR16s', 'repeatPCRits']
+  metadata.columns = ['DBnames', 'sampleType', 'repeatDNAExtraction', 'repeatPCR16s', 'repeatPCRits', 'stage', 'substage']
   allInfo = metadata.merge(ReadsInfo, on='DBnames', how='inner')
   return allInfo
 
@@ -77,6 +77,5 @@ def informationMerge(Project, marker, FastqPath, ResultPath):
   sampleInformation = samplesDBInfo(Project, marker, ResultPath)
   firstMerge = readsInformation.merge(sampleInformation, on='sample')
   firstMerge['Marker'] = marker
-  firstMerge = firstMerge[['sample', 'DBnames', 'date', 'Marker', 'initialReads', 'finalReads', 'percReadsLost', 'sampleType', 'SpNumber', 'MaxSp', 'MaxSp%', 'MaxSpReads', 'repeatDNAExtraction', 'repeatPCR'+marker]]
+  firstMerge = firstMerge[['sample', 'DBnames', 'date', 'Marker', 'initialReads', 'finalReads', 'percReadsLost', 'sampleType', 'stage', 'substage', 'SpNumber', 'MaxSp', 'MaxSp%', 'MaxSpReads', 'repeatDNAExtraction', 'repeatPCR'+marker]]
   firstMerge.to_csv(ResultPath+'/'+Project+'/'+marker+'_'+Project+'_Analysis_Metadata.csv', index=False, decimal=',')
-  print(firstMerge)

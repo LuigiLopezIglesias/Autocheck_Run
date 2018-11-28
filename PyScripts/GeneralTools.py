@@ -30,10 +30,10 @@ def FilesMaker(GitPath, FileName, Body):
 
 #--# Download files from S3
 def fileDownloader(Project, marker, ResultPath, GitPath):
-  aaa = pd.read_csv(GitPath+'/output/links.csv', \
-                    sep=',', \
-                    header=0)
-  for index, row in aaa.iterrows():
+  gitInfo = pd.read_csv(GitPath+'/output/links.csv', \
+                        sep=',', \
+                        header=0)
+  for index, row in gitInfo.iterrows():
     Marker = row[0]
     S3path = row[1]
 
@@ -41,7 +41,7 @@ def fileDownloader(Project, marker, ResultPath, GitPath):
     s3 = boto3.resource('s3')
     try:
       s3.Bucket(S3path.split("/",3)[2]).download_file(S3path.split("/",3)[3], \
-                             ResultPath+'/'+Project+'/'+Marker+'_'+Project+'_mapped_reads_tax.biom')
+                ResultPath+'/'+Project+'/'+Marker+'_'+Project+'_mapped_reads_tax.biom')
     except botocore.exceptions.ClientError as e:
       if e.response['Error']['Code'] == "404":
         print("The object does not exist.")
@@ -64,17 +64,6 @@ def abundanceLoader(Project, marker, ResultPath):
   goodCV = goodCV.rename(columns={'taxonomy_6': 'Species'})
   goodCV = goodCV.sort_values(by=['Species'])
   return(goodCV)
-
-#--# metadata information
-def metadataInfo(Project, marker, FastqPath, ResultPath):
-  ReadsInfo = RA.readsCount(Project, marker, FastqPath, ResultPath)
-  ReadsInfo['DBnames'] = ReadsInfo['sample'].str.split('b').str.get(0)
-  ReadsInfo['DBnames'] = ReadsInfo['DBnames'].str.split('-').str.get(0) 
-  myString = "','".join(ReadsInfo['DBnames'])
-  metadata = Q.DBMetadataQuery(myString)
-  metadata.columns = ['DBnames', 'sampleType', 'repeatDNAExtraction', 'repeatPCR16s', 'repeatPCRits']
-  allInfo = metadata.merge(ReadsInfo, on='DBnames', how='inner')
-  return allInfo
 
 #--# PCoA analysis
 def PCoACalculation(File1, ResultPath, Project, marker, Name):
@@ -101,14 +90,14 @@ def PCoACalculation(File1, ResultPath, Project, marker, Name):
 def abundanceAnalysis(Project, marker, FastqPath, ResultPath):
   from sklearn.preprocessing import StandardScaler
   from sklearn.decomposition import PCA
-  metadata = metadataInfo(Project, marker, FastqPath, ResultPath)
+  metadata = pd.read_csv(ResultPath+'/'+Project+'/'+marker+'_'+Project+'_Analysis_Metadata.csv')
   sampleType = set(metadata['sampleType'])
   for ST in sampleType:
     # Move query here 
-    if ST in {'Negative control', 'Soil control', 'Fermented'}:
-      print(ST+' is not evaluated')
+    if ST in {'Negative control', 'Soil control', 'Grape control'}:
+      print('\x1b[1;31;10m'+ST+'\x1b[0m is not evaluated')
     else:
-      print('Query to have abundance of all samples of '+ST)
+      print('Query to have abundance of all samples of \x1b[1;32;10m'+ST+'\x1b[0m')
       allSamples = Q.fullAbundancesQuery(ST,marker)
       DBsamplesMatrix = allSamples.pivot(index='genus_specie', \
                                          columns='c_muestra_wineseq', \

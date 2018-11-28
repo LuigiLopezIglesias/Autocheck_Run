@@ -14,10 +14,13 @@ def DBconexion():
   return sa.create_engine("postgresql://"+os.environ['DB_USER']+":"+os.environ['DB_PASSWORD']+"@"+os.environ['DB_HOST']+"/"+os.environ['DB_NAME'])
 #------------------------------------------------------------------------------#
 def DBMetadataQuery(samplelist):
-  Text = ('select m.c_muestra_wineseq, tm.d_tipo_muestra, mi.repeat_dna_extraction, mi.repeat_pcr_16s, mi.repeat_pcr_its  '
+  Text = ('select m.c_muestra_wineseq, tm.d_tipo_muestra, mi.repeat_dna_extraction, mi.repeat_pcr_16s, mi.repeat_pcr_its, fs.stage, fss.substage  '
           'from muestra m'
           ' join tipo_muestra tm on tm.c_tipo_muestra = m.c_tipo_muestra'
           ' join muestra_internal mi on m.id = mi.id_muestra'
+          ' left join muestra_ferm mf on mf.id_muestra = m.id'
+          ' left join ferm_stage fs on fs.id = mf.stage'
+          ' left join ferm_substage fss on fss.id = mf.substage'
           ' where m.c_muestra_wineseq in (\''+samplelist+'\')')
   return pd.read_sql(Text, DBconexion())
 #------------------------------------------------------------------------------#
