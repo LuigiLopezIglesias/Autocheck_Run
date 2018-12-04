@@ -16,7 +16,6 @@ parser.add_option('-R', '--ResultPath', action="store", dest="ResultPath", help=
 parser.add_option('-G', '--GitPath', action="store", dest="GitPath", help="Path of folder where will be created git repository", default='/home/yamishakka/Escritorio/New_Pipeline/Run4Jenkins')
 
 options, args = parser.parse_args()
-
 print('Project to analyse is \x1b[1;31;10m'+options.Project+'\x1b[0m')
 
 ###############################################################################

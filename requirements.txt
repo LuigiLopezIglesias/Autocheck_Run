@@ -1,3 +1,9 @@
+boto3
+sqlalchemy
+xlsxwriter
+gitpython
+biom-format
+#numpy
 #SciPy (>= 0.13.3)
 #scikit-learn
-matplotlib
+#matplotlib
