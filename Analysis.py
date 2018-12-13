@@ -1,3 +1,4 @@
+import os
 import optparse
 import PyScripts.GeneralTools    as PyGT
 import PyScripts.ExcelGeneration as PyEG
@@ -10,19 +11,23 @@ import git
 
 parser = optparse.OptionParser()
 
-parser.add_option('-p', '--Project', action="store", dest="Project", help="Project name to work", default=False)
-parser.add_option('-X', '--FastqPath', action="store", dest="FastqPath", help="Path where was storaged the fastq downloaded", default='/media/yamishakka/Elements/Runs_Good')
-parser.add_option('-R', '--ResultPath', action="store", dest="ResultPath", help="Path where result will be stored", default='/home/yamishakka/Escritorio/Biomemakers/00-NP_Abundances')
-parser.add_option('-G', '--GitPath', action="store", dest="GitPath", help="Path of folder where will be created git repository", default='/home/yamishakka/Escritorio/New_Pipeline/Run4Jenkins')
+parser.add_option('-d', '--Date', action="store", dest="Date", help="Project name to work", default=False)
+parser.add_option('-X', '--FastqPath', action="store", dest="FastqPath", help="Path where was storaged the fastq downloaded", default=os.getcwd()+'/FastqPath')
+parser.add_option('-R', '--ResultPath', action="store", dest="ResultPath", help="Path where result will be stored", default=os.getcwd()+'/Results')
+parser.add_option('-G', '--GitPath', action="store", dest="GitPath", help="Path of folder where will be created git repository", default=os.getcwd()+'/Run4Jenkins') #URL del git Run4Jenkins
 
 options, args = parser.parse_args()
-print('Project to analyse is \x1b[1;31;10m'+options.Project+'\x1b[0m')
+print('Project to analyse is \x1b[1;31;10m'+options.Date+'\x1b[0m')
 
 ###############################################################################
 ##  First step: creation of abundance (OTU/Percentaje) files
 ###############################################################################
-PyGT.create_dir(options.ResultPath+'/'+options.Project)
-repo = git.Repo(options.GitPath )
+PyGT.create_dir(options.ResultPath+'/'+options.Date)
+PyGT.create_dir(options.GitPath)
+repo = git.Repo.clone_from('git@github.com:BiomeMakers/Run4Jenkins.git', options.GitPath)
+#repo = git.Repo(options.GitPath)
+#cloned_repo = repo.clone(os.path.join(rw_dir, 'to/this/path'))
+#repo.clone_from(git_url, repo_dir)
 for marker in ['16s', 'its']:
   # Change branch to take information about hash
   repo.git.checkout(options.Project+'_'+marker.upper())

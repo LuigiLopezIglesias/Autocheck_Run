@@ -13,23 +13,35 @@ import pandas        as pd
 import Query         as Q
 import ReadsAnalysis as RA
 # ---------------------------------------------------------------------------- #
+#--# Creation of folder
 def create_dir(directory):
-
-    """
-    Creates a directory if it do not exists
-    :param directory: The name of the directory
-    """
-
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+  """
+  Creates a directory if it do not exists
+  :param directory: The name of the directory
+  """
+  if not os.path.exists(directory):
+      os.makedirs(directory)
 
 #--# Creation of files
 def FilesMaker(GitPath, FileName, Body):
+  """
+  Write a file in path
+  :param GitPAth : The path of folder
+  :param FileName: The name of the file
+  :param Body    : Information of file
+  """
   file = open(GitPath+'/'+FileName,'w+')
   file.write(Body)
 
 #--# Download files from S3
 def fileDownloader(Project, marker, ResultPath, GitPath):
+  """
+  Knowing the hash of result samples will be uploaded to S3
+  :param Project   : project date
+  :param marker    : marker asociated to study
+  :param ResultPath: Folder where   
+  :param GitPath   : Folder where is stoaged the filewith hash result
+  """
   gitInfo = pd.read_csv(GitPath+'/output/links.csv', \
                         sep=',', \
                         header=0)

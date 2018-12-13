@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM luigi/autockeck:0.04 
+FROM luigi/autockeck:0.05 
 
 ## Instal repositories
 #RUN apt-get update \
@@ -32,6 +32,7 @@ COPY requirements.txt Analysis.py /
 #RUN pip install -r requirements.txt
 
 COPY PyScripts/* /PyScripts/
+COPY github_rsa /.shh/github_rsa
 
 # Run app.py when the container launches
-CMD ["python", "/Analysis.py", "-p", "20181113"]
+CMD ["python", "/Analysis.py", "-d", "20181113"]

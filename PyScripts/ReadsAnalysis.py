@@ -59,7 +59,7 @@ def samplesMetrics(Project, marker, ResultPath):
       "MaxSpReads": principalSpReads,
       "SpNumber": SampSpNumber
     })
-  goodCV.groupby(['Species']).sum().to_csv(ResultPath+'/'+Project+'/'+marker.upper()+'_'+Project+'_Abundance.csv', index=False, decimal=',')
+  goodCV.groupby(['Species']).sum().round(0).to_csv(ResultPath+'/'+Project+'/'+marker.upper()+'_'+Project+'_Abundance.csv', index=True, decimal='.')
   return pd.DataFrame(Metrics)
 
 def samplesDBInfo(Project, marker, ResultPath):
