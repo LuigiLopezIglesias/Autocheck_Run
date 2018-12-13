@@ -27,12 +27,31 @@ FROM luigi/autockeck:0.05
 #    && pip install --upgrade pip 
 #
 #RUN pip install python-dateutil==2.7.5
- 
+
+ARG ssh_prv_key
+ARG ssh_pub_key
+
+# Authorize SSH Host
+RUN mkdir -p /root/.ssh && \
+    chmod 700 /root/.ssh && \
+    ssh-keyscan github.com > /root/.ssh/known_hosts
+
+# Authorize SSH Host
+RUN mkdir -p /root/.ssh && \
+    chmod 0700 /root/.ssh && \
+    ssh-keyscan github.com > /root/.ssh/known_hosts
+
+# Add the keys and set permissions
+RUN echo "$ssh_prv_key" > /root/.ssh/id_rsa && \
+    echo "$ssh_pub_key" > /root/.ssh/id_rsa.pub && \
+    chmod 600 /root/.ssh/id_rsa && \
+    chmod 600 /root/.ssh/id_rsa.pub
+
+
 COPY requirements.txt Analysis.py / 
-#RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt
 
 COPY PyScripts/* /PyScripts/
-COPY github_rsa /.shh/github_rsa
 
 # Run app.py when the container launches
 CMD ["python", "/Analysis.py", "-d", "20181113"]

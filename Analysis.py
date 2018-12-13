@@ -30,12 +30,12 @@ repo = git.Repo.clone_from('git@github.com:BiomeMakers/Run4Jenkins.git', options
 #repo.clone_from(git_url, repo_dir)
 for marker in ['16s', 'its']:
   # Change branch to take information about hash
-  repo.git.checkout(options.Project+'_'+marker.upper())
+  repo.git.checkout(options.Date+'_'+marker.upper())
   # Download biom files
-  PyGT.fileDownloader(options.Project, marker, options.ResultPath, options.GitPath)
+  PyGT.fileDownloader(options.Date, marker, options.ResultPath, options.GitPath)
   # OTU files creation
-  PyEG.mappedToOtus(options.Project, marker, options.ResultPath)
+  PyEG.mappedToOtus(options.Date, marker, options.ResultPath)
   ## metadata information
-  PyRA.informationMerge(options.Project, marker, options.FastqPath, options.ResultPath)
+  PyRA.informationMerge(options.Date, marker, options.FastqPath, options.ResultPath)
   # PCoA analysis
-  PyGT.abundanceAnalysis(options.Project, marker, options.FastqPath, options.ResultPath)
+  PyGT.abundanceAnalysis(options.Date, marker, options.FastqPath, options.ResultPath)
