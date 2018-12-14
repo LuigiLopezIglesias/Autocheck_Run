@@ -49,7 +49,7 @@ RUN echo "$ssh_prv_key" > /root/.ssh/id_rsa && \
 
 
 COPY requirements.txt Analysis.py / 
-RUN pip install -r requirements.txt
+#RUN pip install -r requirements.txt
 
 COPY PyScripts/* /PyScripts/
 
