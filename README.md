@@ -37,6 +37,6 @@ To execute Docker is needed
  `docker build -t luigi/autockeck:0.06 --build-arg ssh_prv_key="$(cat ./github_rsa)" --build-arg ssh_pub_key="$(cat ~/github_rsa.pub)" .`
 
 This load the image in local computer. Then to make run the program is necessary
- `docker run -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY luigi/autockeck:0.06`
+ `docker run -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AccessToken=$AccessToken -e DB_USER=$DB_USER -e DB_PASSWORD=$DB_PASSWORD -e DB_HOST=$DB_HOST -e DB_PORT=$DB_PORT -e DB_NAME=$DB_NAME luigi/autockeck:0.07`
 
 
