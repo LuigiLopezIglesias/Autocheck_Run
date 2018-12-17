@@ -48,8 +48,8 @@ RUN echo "$ssh_prv_key" > /root/.ssh/id_rsa && \
     chmod 600 /root/.ssh/id_rsa.pub
 
 
-COPY requirements.txt Analysis.py / 
-#RUN pip install -r requirements.txt
+COPY requirements.txt Analysis.py Logo-BM_DL_negro.png / 
+RUN pip install -r requirements.txt
 
 COPY PyScripts/* /PyScripts/
 
