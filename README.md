@@ -33,10 +33,47 @@ Aqui lo que haremos es que a partir del archivo `.biom` que se ha generado en el
 
 #######################################################DOCKER###################
 
-To execute Docker is needed 
- `docker build -t luigi/autockeck:0.06 --build-arg ssh_prv_key="$(cat ./github_rsa)" --build-arg ssh_pub_key="$(cat ~/github_rsa.pub)" .`
+To build Docker container is needed 
+1. Storage in this folder the files with github credentials to access Run4Jenkins repository
+*github_rsa*
+```
+-----BEGIN RSA PRIVATE KEY-----
+**********************
+**********************
+**********************
+**********************
+**********************
+**********************
+-----END RSA PRIVATE KEY-----
+
+```
+*github_rsa.pub*
+```
+ssh-rsa ************************
+```
+2. use the command to build the image in localhost and can run a container
+ `docker build -t luigi/autockeck:0.08 --build-arg ssh_prv_key="$(cat ./github_rsa)" --build-arg ssh_pub_key="$(cat ./github_rsa.pub)" .`
 
 This load the image in local computer. Then to make run the program is necessary
- `docker run -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AccessToken=$AccessToken -e DB_USER=$DB_USER -e DB_PASSWORD=$DB_PASSWORD -e DB_HOST=$DB_HOST -e DB_PORT=$DB_PORT -e DB_NAME=$DB_NAME luigi/autockeck:0.07`
+
+1. Create a file names env.list that contain the credentials for different conexions
+```
+# AWS Credentials
+AWS_ACCESS_KEY_ID=********************
+AWS_SECRET_ACCESS_KEY=********************
+# BS Credentials
+ClientKey=********************
+ClientSecret=********************
+AccessToken=********************
+# DB Credentials
+DB_USER=********************
+DB_PASSWORD=********************
+DB_HOST=********************
+DB_PORT=********************
+DB_NAME=********************
+
+```
+2. Run the image of container with parameters of env.list and RunDate
+ `docker run --env-file env.list -e RunDate=20181113 luigi/autockeck:0.09`
 
 
