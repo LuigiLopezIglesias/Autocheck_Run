@@ -42,7 +42,6 @@ def samplesIdDetection(Project, marker):
   sampleid = json_obj['Items'][sampleindex]['Id']
   samplelist.append(sampleid)
  samplecsv = ','.join([str(i) for i in samplelist])
- #print(samplecsv)
  return(samplecsv)
   
 def biosamplesDataset(Project, marker):

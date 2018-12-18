@@ -79,6 +79,8 @@ def abundanceLoader(Project, marker, ResultPath):
 
 #--# PCoA analysis
 def PCoACalculation(File1, ResultPath, Project, marker, Name):
+  import matplotlib
+  matplotlib.use('Agg')
   import matplotlib.pyplot as plt
   fig = plt.figure(figsize = (8,8))
   ax = fig.add_subplot(1,1,1)
@@ -102,7 +104,7 @@ def PCoACalculation(File1, ResultPath, Project, marker, Name):
 def abundanceAnalysis(Project, marker, FastqPath, ResultPath):
   from sklearn.preprocessing import StandardScaler
   from sklearn.decomposition import PCA
-  metadata = pd.read_csv(ResultPath+'/'+Project+'/'+marker+'_'+Project+'_Analysis_Metadata.csv')
+  metadata = pd.read_csv(ResultPath+'/'+Project+'/'+marker+'_'+Project+'_Analysis_Metadata.xlsx')
   sampleType = set(metadata['sampleType'])
   for ST in sampleType:
     # Move query here 

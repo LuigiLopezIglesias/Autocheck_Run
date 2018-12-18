@@ -104,7 +104,7 @@ def mappedToOtus(Project, marker, ResultPath):
     worksheet.set_column('C:C', 25, fmt)
     worksheet.set_row(0, 70)
     worksheet.merge_range('A1:C1', '')
-    worksheet.insert_image('A1', '/home/yamishakka/Documentos/Biomemakers/Logo-BM_DL_negro-1024x323-e1521645909584.png', {'x_offset': 15, 'y_offset': 10})
+    worksheet.insert_image('A1', '/Logo-BM_DL_negro.png', {'x_offset': 15, 'y_offset': 10})
     writer.save()
     ## Creation percent Abundance file
     groupedSpecies = bbb.groupby(['Species']).sum()
@@ -126,7 +126,7 @@ def mappedToOtus(Project, marker, ResultPath):
     worksheet.set_column('B:B', 10, fmt)
     worksheet.set_row(0, 70)
     worksheet.merge_range('A1:B1', '')
-    worksheet.insert_image('A1', '/home/yamishakka/Documentos/Biomemakers/Logo-BM_DL_negro-1024x323-e1521645909584.png', {'x_offset': 15, 'y_offset': 10})
+    worksheet.insert_image('A1', '/Logo-BM_DL_negro.png', {'x_offset': 15, 'y_offset': 10})
     writer.save()
 
 #  print('Creation of \x1b[1;31;10m'+Project+'\x1b[0m abundance')
