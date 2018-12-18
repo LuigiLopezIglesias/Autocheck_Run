@@ -6,6 +6,6 @@ biom-format
 psycopg2
 psycopg2-binary
 #numpy
-#SciPy (>= 0.13.3)
+SciPy (>= 0.13.3)
 scikit-learn
-#matplotlib
+matplotlib
