@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM luigi/autockeck:0.05 
+FROM luigi/autockeck:0.09 
 
 ## Instal repositories
 #RUN apt-get update \
@@ -21,7 +21,8 @@ FROM luigi/autockeck:0.05
 #    libstdc++6 \
 #    python-cogent \
 #    python-dateutil \
-#    biom-format-tools \ 
+#    biom-format-tools \
+#    python-tk \ 
 #    && apt-get autoremove \
 #    && apt-get clean \
 #    && pip install --upgrade pip 
@@ -49,9 +50,9 @@ RUN echo "$ssh_prv_key" > /root/.ssh/id_rsa && \
 
 
 COPY requirements.txt Analysis.py Logo-BM_DL_negro.png / 
-RUN pip install -r requirements.txt
+#RUN pip install -r requirements.txt
 
 COPY PyScripts/* /PyScripts/
 
 # Run app.py when the container launches
-CMD ["python", "/Analysis.py", "-d", "20181113"]
+CMD ["python", "/Analysis.py"]
