@@ -131,6 +131,8 @@ def samplesMetrics(Project, marker, ResultPath):
       "MaxSpReads": principalSpReads,
       "SpNumber": SampSpNumber
     })
+  goodCV['Species'] = goodCV['Species'].str.replace('Bacillus anthracis','Bacillus sp.')
+  goodCV['Species'] = goodCV['Species'].str.replace('Cronobacter mallotivora','Pantoea sp.')
   goodCV.groupby(['Species']).sum().round(0).to_csv(ResultPath+'/'+Project+'/'+marker.upper()+'_'+Project+'_Abundance.csv', index=True, decimal='.')
   return pd.DataFrame(Metrics)
 
