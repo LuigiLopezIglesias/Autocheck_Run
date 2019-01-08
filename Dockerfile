@@ -1,33 +1,33 @@
 # Use an official Python runtime as a parent image
-FROM luigi/autockeck:0.09 
+FROM  ubuntu:16.04 
 
-## Instal repositories
-#RUN apt-get update \
-#    && apt-get upgrade -y \
-#    && apt-get install -y \
-#    apt-utils \
-#    build-essential \
-#    ca-certificates \
-#    gcc \
-#    git \
-#    libpq-dev \
-#    make \
-#    python-pip \
-#    python2.7 \
-#    python2.7-dev \
-#    ssh \
-#    libc6 \
-#    libgcc1 \
-#    libstdc++6 \
-#    python-cogent \
-#    python-dateutil \
-#    biom-format-tools \
-#    python-tk \ 
-#    && apt-get autoremove \
-#    && apt-get clean \
-#    && pip install --upgrade pip 
-#
-#RUN pip install python-dateutil==2.7.5
+# Instal repositories
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y \
+    apt-utils \
+    build-essential \
+    ca-certificates \
+    gcc \
+    git \
+    libpq-dev \
+    make \
+    python-pip \
+    python2.7 \
+    python2.7-dev \
+    ssh \
+    libc6 \
+    libgcc1 \
+    libstdc++6 \
+    python-cogent \
+    python-dateutil \
+    biom-format-tools \
+    python-tk \ 
+    && apt-get autoremove \
+    && apt-get clean \
+    && pip install --upgrade pip 
+
+RUN pip install python-dateutil==2.7.5
 
 ARG ssh_prv_key
 ARG ssh_pub_key
@@ -50,7 +50,7 @@ RUN echo "$ssh_prv_key" > /root/.ssh/id_rsa && \
 
 
 COPY requirements.txt Analysis.py Logo-BM_DL_negro.png / 
-#RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt
 
 COPY PyScripts/* /PyScripts/
 
