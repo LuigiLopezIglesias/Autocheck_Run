@@ -108,7 +108,7 @@ def abundanceAnalysis(Project, marker, FastqPath, ResultPath):
   sampleType = set(metadata['sampleType'])
   for ST in sampleType:
     # Move query here 
-    if ST in {'Negative control', 'Soil control', 'Grape control'}:
+    if ST in {'Negative control', 'Soil control', 'Grape control', 'Plant Pine'}:
       print('\x1b[1;31;10m'+ST+'\x1b[0m is not evaluated')
     else:
       print('Query to have abundance of all samples of \x1b[1;32;10m'+ST+'\x1b[0m')
