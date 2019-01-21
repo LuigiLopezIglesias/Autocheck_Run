@@ -61,8 +61,11 @@ def biosamplesDataset(Project, marker):
   nDatasets = len(json_obj['Items'])
   for fileindex in range(nDatasets):
     SampName = json_obj['Items'][fileindex]['Name'].split("_",1)[0]
-    ProjName = Project #json_obj['Items'][fileindex]['Project']['Name']
+    #print(SampName)
+    ProjName = json_obj['Items'][fileindex]['Project']['Name']
+    #print(ProjName)
     InitialReads = json_obj['Items'][fileindex]['Attributes']['common_fastq']['TotalClustersRaw']
+    #print(InitialReads)
     IReads.append(InitialReads)
     sampleName.append(SampName)
     projectRef.append(ProjName)

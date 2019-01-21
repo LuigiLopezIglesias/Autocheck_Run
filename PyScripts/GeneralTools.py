@@ -40,7 +40,7 @@ def fileDownloader(Project, marker, ResultPath, GitPath):
   :param Project   : project date
   :param marker    : marker asociated to study
   :param ResultPath: Folder where   
-  :param GitPath   : Folder where is stoaged the filewith hash result
+  :param GitPath   : Folder where is stoaged the file with hash result
   """
   gitInfo = pd.read_csv(GitPath+'/output/links.csv', \
                         sep=',', \
@@ -50,7 +50,6 @@ def fileDownloader(Project, marker, ResultPath, GitPath):
     S3path = row[1]
     ## Download mapped file
     s3 = boto3.resource('s3')
-    print(s3)
     try:
       s3.Bucket(S3path.split("/",3)[2]).download_file(S3path.split("/",3)[3], \
                 ResultPath+'/'+Project+'/'+Marker+'_'+Project+'_mapped_reads_tax.biom')
@@ -108,7 +107,7 @@ def abundanceAnalysis(Project, marker, FastqPath, ResultPath):
   sampleType = set(metadata['sampleType'])
   for ST in sampleType:
     # Move query here 
-    if ST in {'Negative control', 'Soil control', 'Grape control', 'Plant Pine'}:
+    if ST in {'Negative control', 'Soil control', 'Grape control', 'Plant Pine', 'Root Vine'}:
       print('\x1b[1;31;10m'+ST+'\x1b[0m is not evaluated')
     else:
       print('Query to have abundance of all samples of \x1b[1;32;10m'+ST+'\x1b[0m')
