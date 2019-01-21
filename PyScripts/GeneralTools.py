@@ -48,9 +48,9 @@ def fileDownloader(Project, marker, ResultPath, GitPath):
   for index, row in gitInfo.iterrows():
     Marker = row[0]
     S3path = row[1]
-
     ## Download mapped file
     s3 = boto3.resource('s3')
+    print(s3)
     try:
       s3.Bucket(S3path.split("/",3)[2]).download_file(S3path.split("/",3)[3], \
                 ResultPath+'/'+Project+'/'+Marker+'_'+Project+'_mapped_reads_tax.biom')
