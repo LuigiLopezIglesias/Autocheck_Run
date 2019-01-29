@@ -79,8 +79,8 @@ pandas.io.formats.excel.header_style = None
 
 def mappedToOtus(Project, marker, ResultPath):
   goodCV = GT.abundanceLoader(Project, marker, ResultPath)
-  goodCV['Species'] = goodCV['Species'].str.replace('Bacillus anthracis','Bacillus sp.')
-  goodCV['Species'] = goodCV['Species'].str.replace('Cronobacter mallotivora','Pantoea sp.')
+  #goodCV['Species'] = goodCV['Species'].str.replace('Bacillus anthracis','Bacillus sp.')
+  #goodCV['Species'] = goodCV['Species'].str.replace('Cronobacter mallotivora','Pantoea sp.')
   print('Creation of \x1b[1;31;10m'+Project+'\x1b[0m OTU abundance')
   for sample in list(goodCV.columns.values[:-1]):
     aaa = goodCV[[sample, 'Species']]

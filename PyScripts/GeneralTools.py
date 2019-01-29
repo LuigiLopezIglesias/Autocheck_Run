@@ -73,6 +73,8 @@ def abundanceLoader(Project, marker, ResultPath):
   goodCV.taxonomy_6 = goodCV.taxonomy_6.str[2:]
   goodCV = goodCV.drop(['confidence', 'taxonomy_0', 'taxonomy_1', 'taxonomy_2', 'taxonomy_3', 'taxonomy_4', 'taxonomy_5', 'taxonomy_6'], axis=1)
   goodCV = goodCV.rename(columns={'taxonomy_6': 'Species'})
+  goodCV['Species'] = goodCV['Species'].str.replace('Bacillus anthracis','Bacillus sp.')
+  goodCV['Species'] = goodCV['Species'].str.replace('Cronobacter mallotivora','Pantoea sp.')
   goodCV = goodCV.sort_values(by=['Species'])
   return(goodCV)
 
