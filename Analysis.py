@@ -42,6 +42,6 @@ for marker in ['16s', 'its']:
   # metadata information
   print("Creation of metadata files in \x1b[1;36;10m"+options.ResultPath+"\x1b[0m")
   PyRA.informationMerge(options.Date, marker, options.ResultPath)
-  # PCoA analysis
-  print("Creation of graphic files in \x1b[1;36;10m"+options.ResultPath+"\x1b[0m")
-  PyGT.abundanceAnalysis(options.Date, marker, options.FastqPath, options.ResultPath)
+#  # PCoA analysis
+#  print("Creation of graphic files in \x1b[1;36;10m"+options.ResultPath+"\x1b[0m")
+#  PyGT.abundanceAnalysis(options.Date, marker, options.FastqPath, options.ResultPath)

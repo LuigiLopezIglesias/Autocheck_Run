@@ -77,10 +77,10 @@ DB_NAME=********************
 ```
 2. Run the image of container with parameters of env.list and RunDate
 
-`docker run --name Run20181113 --env-file env.list -e RunDate=20181113 luigi/autockeck:0.10`
+`docker run -ti --name Run*Date* --env-file env.list -e RunDate=*Date* luigi/autockeck:0.10`
 
 --name is the container name that will be used to have a pattern to copy from container the result folder
 
 The last step is take the results to localhost for this the command will be.
 
-`docker cp Run20181113:/Results/20181113/ ./Results/`
+`docker cp Run*Date*:/Results/*Date*/ ./Results/`

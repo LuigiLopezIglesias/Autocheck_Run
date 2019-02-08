@@ -50,6 +50,8 @@ def fileDownloader(Project, marker, ResultPath, GitPath):
     S3path = row[1]
     ## Download mapped file
     s3 = boto3.resource('s3')
+    s3.Bucket(S3path.split("/",3)[2]).download_file(S3path.split("/",3)[3], \
+                ResultPath+'/'+Project+'/'+Marker+'_'+Project+'_mapped_reads_tax.biom')
     try:
       s3.Bucket(S3path.split("/",3)[2]).download_file(S3path.split("/",3)[3], \
                 ResultPath+'/'+Project+'/'+Marker+'_'+Project+'_mapped_reads_tax.biom')
@@ -108,8 +110,9 @@ def abundanceAnalysis(Project, marker, FastqPath, ResultPath):
   metadata = pd.read_csv(ResultPath+'/'+Project+'/'+marker+'_'+Project+'_Analysis_Metadata.xlsx')
   sampleType = set(metadata['sampleType'])
   for ST in sampleType:
-    # Move query here 
-    if ST in {'Negative control', 'Soil control', 'Grape control', 'Plant Pine', 'Root Vine'}:
+    # Move query here
+    # change if by type by number of samples with sample type 
+    if ST in {'Negative control', 'Soil control', 'Grape control', 'Plant Pine', 'Root Vine', 'Root Olive'}:
       print('\x1b[1;31;10m'+ST+'\x1b[0m is not evaluated')
     else:
       print('Query to have abundance of all samples of \x1b[1;32;10m'+ST+'\x1b[0m')
