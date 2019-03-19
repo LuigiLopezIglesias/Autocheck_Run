@@ -50,8 +50,6 @@ def fileDownloader(Project, marker, ResultPath, GitPath):
     S3path = row[1]
     ## Download mapped file
     s3 = boto3.resource('s3')
-    s3.Bucket(S3path.split("/",3)[2]).download_file(S3path.split("/",3)[3], \
-                ResultPath+'/'+Project+'/'+Marker+'_'+Project+'_mapped_reads_tax.biom')
     try:
       s3.Bucket(S3path.split("/",3)[2]).download_file(S3path.split("/",3)[3], \
                 ResultPath+'/'+Project+'/'+Marker+'_'+Project+'_mapped_reads_tax.biom')
@@ -75,9 +73,11 @@ def abundanceLoader(Project, marker, ResultPath):
   goodCV.taxonomy_6 = goodCV.taxonomy_6.str[2:]
   goodCV = goodCV.drop(['confidence', 'taxonomy_0', 'taxonomy_1', 'taxonomy_2', 'taxonomy_3', 'taxonomy_4', 'taxonomy_5', 'taxonomy_6'], axis=1)
   goodCV = goodCV.rename(columns={'taxonomy_6': 'Species'})
+  ## Modification of wrong species
   goodCV['Species'] = goodCV['Species'].str.replace('Bacillus anthracis','Bacillus sp.')
   goodCV['Species'] = goodCV['Species'].str.replace('Cronobacter mallotivora','Pantoea sp.')
   goodCV = goodCV.sort_values(by=['Species'])
+  goodCV.groupby(['Species']).sum().round(0).to_csv(ResultPath+'/'+Project+'/'+marker.upper()+'_'+Project+'_Abundance.csv', index=True, encoding='utf-8', decimal='.')
   return(goodCV)
 
 #--# PCoA analysis
@@ -112,7 +112,7 @@ def abundanceAnalysis(Project, marker, FastqPath, ResultPath):
   for ST in sampleType:
     # Move query here
     # change if by type by number of samples with sample type 
-    if ST in {'Negative control', 'Soil control', 'Grape control', 'Plant Pine', 'Root Vine', 'Root Olive'}:
+    if ST in {'Negative control', 'Soil control', 'Grape control', 'Substratum'}:
       print('\x1b[1;31;10m'+ST+'\x1b[0m is not evaluated')
     else:
       print('Query to have abundance of all samples of \x1b[1;32;10m'+ST+'\x1b[0m')

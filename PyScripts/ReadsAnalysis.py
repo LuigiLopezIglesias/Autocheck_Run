@@ -28,6 +28,7 @@ def restrequest(rawrequest):
  return json_obj
 
 def samplesIdDetection(Project, marker):
+ print(Project, marker)
  #Step 1: Find the project ID from project name first, then have biosamples ID
  #assume fewer than 2 projects with name
  ProjectNameRequest = 'https://api.basespace.illumina.com/v1pre3/users/current/projects?Name=%s_%s&Offset=0&Limit=2&SortDir=Asc&access_token=%s' %(Project, marker.upper(),  os.environ['AccessToken'])
@@ -136,7 +137,7 @@ def samplesMetrics(Project, marker, ResultPath):
     })
   goodCV['Species'] = goodCV['Species'].str.replace('Bacillus anthracis','Bacillus sp.')
   goodCV['Species'] = goodCV['Species'].str.replace('Cronobacter mallotivora','Pantoea sp.')
-  goodCV.groupby(['Species']).sum().round(0).to_csv(ResultPath+'/'+Project+'/'+marker.upper()+'_'+Project+'_Abundance.csv', index=True, decimal='.')
+  goodCV.groupby(['Species']).sum().round(0).to_csv(ResultPath+'/'+Project+'/'+marker.upper()+'_'+Project+'_Abundance.csv', encoding='utf-8', index=True, decimal='.')
   return pd.DataFrame(Metrics)
 
 def samplesDBInfo(Project, marker, ResultPath):
