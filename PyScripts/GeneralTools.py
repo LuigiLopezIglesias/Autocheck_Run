@@ -110,13 +110,12 @@ def abundanceAnalysis(Project, marker, FastqPath, ResultPath):
   metadata = pd.read_csv(ResultPath+'/'+Project+'/'+marker+'_'+Project+'_Analysis_Metadata.xlsx')
   sampleType = set(metadata['sampleType'])
   for ST in sampleType:
-    # Move query here
-    # change if by type by number of samples with sample type 
-    if ST in {'Negative control', 'Soil control', 'Grape control', 'Substratum'}:
+    allSamples = Q.fullAbundancesQuery(ST,marker)
+    if len(set(allSamples['c_muestra_wineseq'])) < 2:
       print('\x1b[1;31;10m'+ST+'\x1b[0m is not evaluated')
+    # Move query here
     else:
       print('Query to have abundance of all samples of \x1b[1;32;10m'+ST+'\x1b[0m')
-      allSamples = Q.fullAbundancesQuery(ST,marker)
       DBsamplesMatrix = allSamples.pivot(index='genus_specie', \
                                          columns='c_muestra_wineseq', \
                                          values='num_reads').fillna(0)
@@ -129,6 +128,13 @@ def abundanceAnalysis(Project, marker, FastqPath, ResultPath):
                                              left_index=True, \
                                              right_index=True, \
                                              how = 'outer').fillna(0)
+      print(allSamples.head(5))
+      for k in list(allSamples):
+        total = allSamples[k].sum()
+        allSamples[k] = allSamples[k]*100/total
+      print(allSamples.head(5))
+      allSamples[allSamples < 1] = 0
+      print(allSamples.head(5))
       # Standardizing the features
       normAllSamples = StandardScaler().fit_transform(allSamples.T)
       MONormalized = pd.DataFrame(data = normAllSamples, columns = list(allSamples.T))

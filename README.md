@@ -54,7 +54,7 @@ ssh-rsa ************************
 ```
 2. use the command to build the image in localhost and can run a container
 
-`docker build -t luigi/autockeck:0.10 --build-arg ssh_prv_key="$(cat ./github_rsa)" --build-arg ssh_pub_key="$(cat ./github_rsa.pub)" .`
+`docker build -t luigi/autockeck:1.00 --build-arg ssh_prv_key="$(cat ./github_rsa)" --build-arg ssh_pub_key="$(cat ./github_rsa.pub)" .`
 
 This load the image in local computer. Then to make run the program is necessary
 
@@ -77,7 +77,7 @@ DB_NAME=********************
 ```
 2. Run the image of container with parameters of env.list and RunDate
 
-`docker run -ti --name Run*Date* --env-file env.list -e RunDate=*Date* luigi/autockeck:0.10`
+`docker run -ti --name Run*Date* --env-file env.list -e RunDate=*Date* luigi/autockeck:1.00`
 
 --name is the container name that will be used to have a pattern to copy from container the result folder
 
